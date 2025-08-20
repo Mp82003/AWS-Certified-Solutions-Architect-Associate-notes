@@ -1,0 +1,2 @@
+# AWS-Certified-Solutions-Architect-Associate-notes
+“Comprehensive notes and resources for AWS Certified Solutions Architect – Associate (SAA-C03).”  “Study notes, key concepts, and exam prep for AWS Solutions Architect Associate certification.”  “Organized AWS Solutions Architect Associate (SAA-C03) notes for exam prep and quick revision.” covering core services, design principles, and exam tips.”
