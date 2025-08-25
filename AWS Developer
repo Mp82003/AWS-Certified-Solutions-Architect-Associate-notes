@@ -29,3 +29,125 @@ AWS Cloud9:
 7. Multi-environment Support
    Developers can maintain multiple isolated environments for different projects.
    Helpful in separating dependencies across projects.
+
+AWS CodeBuild:
+ 1. Definition
+    Fully managed Continuous Integration (CI) service.
+    Automates build, test, and packaging of code.
+    Removes need to provision/manage build servers.
+2. Core Features
+    Preconfigured build environments → ready-to-use with multiple programming languages/tools.
+    Custom build environments → define your own Docker images to include specific dependencies.
+    Scales automatically → runs multiple builds concurrently, no queue waiting.
+  Integration with AWS services:
+   CodeCommit (source repo)
+   S3 (artifact storage)
+   CodePipeline (CI/CD orchestration)
+   CloudWatch (monitoring/logging)
+   SNS (notifications)
+3. Artifacts & Logging
+   Build artifacts can be stored in Amazon S3.
+   Build logs available in Amazon CloudWatch Logs for debugging.
+   Supports notifications via SNS for build status.
+4. Security
+   Uses IAM roles for permissions (fine-grained control over what CodeBuild can access).
+   Supports encryption (KMS for artifacts and logs).
+5. Use Cases
+   Automating CI/CD pipelines.
+   Replacing self-managed Jenkins build servers (Jenkins jobs can run in CodeBuild).
+   Building and testing code directly from GitHub, CodeCommit, Bitbucket.
+   Packaging software for deployment to Elastic Beanstalk, ECS/EKS, S3, or container registries.
+6. Pricing
+   Pay-as-you-go model → charged per build minute.
+   Cost depends on compute type (vCPU + memory).
+   Free Tier: 100 build minutes/month (General1.small or ARM1.small).
+Additional charges if using:
+   CloudWatch Logs (log storage)
+   S3 (artifact storage)
+   KMS (encryption)
+  CodePipeline (if integrated).
+7. Architectural Fit (for exam scenarios)
+   High scalability → No need to manage build servers (CodeBuild auto scales).
+   Flexibility → Choose pre-built environments or bring your own (Docker image).
+   Reliability → Fully managed, highly available, integrates natively with AWS developer tools.
+   Security → IAM + KMS.
+   Cost efficiency → Pay per build minute (no idle server costs).
+
+AWS CodeArtifact:
+  1. Purpose
+    Fully managed artifact repository service.
+    Stores, manages, and shares software packages & dependencies (npm, pip, Maven, NuGet).
+    Removes the need to manage your own artifact storage system.
+2. Core Concepts
+   Domain → Logical grouping of repositories (recommended: single production domain).
+   Repository → Stores a collection of package versions; polyglot (can contain different package types).
+   Package → Bundle of software + metadata (name, namespace, versions).
+   Package Version → Specific version of a package.
+   Package Version Revision → Identifies updates to a package version.
+   Asset → Individual file in CodeArtifact (e.g., .jar, .tgz).
+   Upstream Repository → Allows fetching from external sources if artifact not available locally.
+3. Features
+   Integration with AWS DevOps tools: CodeBuild, CodeDeploy, CodePipeline.
+   Acts as a proxy/cache for public repos (npm, Maven Central, PyPI, NuGet Gallery).
+   Fine-grained access control via IAM policies.
+   Cross-region replication supported for high availability.
+   No limits on number/size of packages stored.
+   Can host private packages (for proprietary/internal software).
+4. Artifact Types
+  Deployment artifacts → executables, installers (.deb, .rpm, .msi, .exe).
+  Library artifacts → packages for use in development (npm, Maven, pip).
+  Bundle artifacts → group of artifacts for deployment.
+  Pipeline artifacts → temporary build outputs inside CI/CD pipelines.
+5. Workflow
+  Create domain and repository.
+  Configure package format (npm, Maven, pip, NuGet).
+  Set IAM policies for access.
+  Upload artifacts or fetch from external repositories.
+  Cached artifacts reused for future requests.
+6. Pricing (high-level, exam-relevant)
+  Free tier → 2 GB storage + 100K requests/month.
+  Storage → $0.05 per GB-month.
+  Requests → $0.05 per 10,000 requests.
+  Data transfer out → standard AWS data transfer pricing (first 9.999 TB = $0.09/GB).
+
+AWS CodePipeline:
+ 1. Purpose
+   Fully managed Continuous Integration (CI) & Continuous Delivery (CD) service.
+   Automates build, test, and deployment of applications.
+   Helps achieve fast, reliable, repeatable software delivery.
+2. Core Concepts
+  Pipeline = Workflow of stages.
+  Stages = Logical units (Source → Build → Test → Deploy → Approval).
+  Actions = Tasks inside stages (build, deploy, test, approval, custom Lambda).
+  Artifacts = Outputs of a stage (e.g., build packages), stored in Amazon S3.
+3. Features
+   Source stage: Integrates with CodeCommit, GitHub, Bitbucket, or S3.
+   Build stage: Usually uses CodeBuild, but can use Jenkins/3rd-party tools.
+   Deploy stage: Works with CodeDeploy, Elastic Beanstalk, ECS, Lambda, CloudFormation.
+   Approval stage: Supports manual approval before continuing.
+   Notifications: Integrated with SNS, CloudWatch for monitoring and alerts.
+   Extensible: Can use AWS Lambda or custom actions to add custom logic.
+   Security: Controlled by IAM roles & policies.
+4. Integrations
+   AWS native services: CodeCommit, CodeBuild, CodeDeploy, CodeArtifact, Lambda, S3.
+   3rd-party: GitHub, Jenkins, Bitbucket, etc.
+   Monitoring: CloudWatch logs, metrics, alarms.
+5. Execution
+   Pipelines trigger automatically (on source code changes) or manually.
+   Automatic rollback if tests fail.
+   Parallel execution supported for faster testing/deployment.
+6. Pricing
+   $1 per active pipeline/month.
+   An active pipeline = exists >30 days AND processes at least one code change that month.
+   Free tier: 1 free active pipeline/month (for new & existing customers).
+   Extra charges: S3 storage, data transfer, and other AWS services used in pipeline.
+
+
+
+
+
+
+
+
+
+
