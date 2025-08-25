@@ -1,0 +1,31 @@
+AWS Cloud9:
+  What is AWS Cloud9?
+  A cloud-based IDE (Integrated Development Environment).
+  Accessible from any browser, no need to install or configure a local IDE.
+  Includes code editor, debugger, and terminal.
+2. Supported Languages & Tools
+   Comes prepackaged with 40+ languages (Node.js, Python, JavaScript, PHP, Ruby, Go, C++, etc.).
+   Built-in code hinting, autocompletion, and step-through debugging.
+  Has a browser-based terminal to run Linux commands, push code to Git, or install packages.
+3. Pricing
+   No additional charge for Cloud9 itself.
+   You only pay for underlying resources (e.g., EC2, EBS).
+   Option to connect Cloud9 via SSH to an existing Linux server → no extra cost.
+   Free tier eligible: Cloud9 is free if used within AWS Free Tier limits.
+4. Deployment & Flexibility
+   Can run Cloud9 environment on:
+   A managed EC2 instance, or
+   An existing Linux server via SSH.
+   Removes the need to manage a local IDE.
+5. Collaboration Features
+   Real-time collaboration: multiple developers can edit code simultaneously.
+   Can share environments with the same tools/settings.
+   Has built-in chat & conferencing for communication.
+   Supports inline code reviews and comments.
+6. Serverless Development
+  Preconfigured with SDKs, libraries, and plugins for AWS services.
+  Simplifies development of serverless applications (AWS Lambda).
+  Supports local testing and debugging of Lambda functions.
+7. Multi-environment Support
+   Developers can maintain multiple isolated environments for different projects.
+   Helpful in separating dependencies across projects.
