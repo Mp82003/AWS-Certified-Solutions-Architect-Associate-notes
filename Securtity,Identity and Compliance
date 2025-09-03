@@ -11,4 +11,137 @@ Principle of Least Privilege - Only grant necessary permissions
 Group-based Management - Always use groups for permission assignment
 Root User Security - Create admin users instead of using root
 Immediate Permission Changes - Removing users from groups instantly revokes access
-.
+
+## Three Main Use Cases for IAM Roles
+
+### 1. AWS Service-to-Service Access
+- **Example**: EC2 instance accessing S3 bucket
+- EC2 service assumes a role to access other AWS services
+- Most common scenario in real-world applications
+
+### 2. Cross-Account Access
+- Users from **Account A** accessing resources in **Account B**
+- Eliminates need to create duplicate users across accounts
+- Enables secure resource sharing between AWS accounts
+
+### 3. Federated Access
+- **Active Directory users** or other external identity providers
+- External users get temporary AWS access without AWS IAM user accounts
+- Supports SAML, OpenID Connect, and custom identity providers
+
+## Key Components
+
+### Trust Policy
+- Defines **who** can assume the role
+- Written in JSON format
+- Specifies trusted entities (services, accounts, federated users)
+
+### Permission Policy
+- Defines **what** the role can do once assumed
+- Attached like regular IAM policies
+- Can attach multiple policies to one role
+
+## Common AWS Services Using Roles
+
+### Most Frequent:
+- **EC2** - For applications running on instances
+- **Lambda** - For serverless function execution
+
+### Others:
+- ECS tasks
+- EKS pods
+- CodeBuild projects
+- CodePipeline
+- API Gateway
+
+## Hands-On Demo Key Points
+
+### Creating Role for EC2:
+1. Go to IAM Console → Roles → Create Role
+2. Select "AWS Service" as trusted entity
+3. Choose "EC2" as the service
+4. Attach permission policies
+5. Name the role and create
+
+### Attaching Role to EC2:
+1. Select EC2 instance
+2. Actions → Security → Modify IAM role
+3. Select the created role
+4. Apply changes
+
+### Testing Access:
+```bash
+# Before role attachment - fails
+aws iam list-users
+# After role attachment - succeeds
+aws iam list-users
+```
+
+## Important Exam Points
+
+### Role Assumption Process:
+1. Service/user requests to assume role
+2. AWS STS (Security Token Service) validates request
+3. If allowed, STS issues temporary credentials
+4. Credentials include: Access Key ID, Secret Access Key, Session Token
+5. Credentials expire automatically (default 1 hour, max 12 hours)
+
+### Security Benefits:
+- **No credential storage** in applications
+- **Automatic rotation** of credentials
+- **Principle of least privilege** - only necessary permissions
+- **Audit trail** - all role assumptions logged in CloudTrail
+
+### Best Practices:
+- Use roles instead of IAM users for applications
+- Apply least privilege principle
+- Use external ID for third-party access
+- Monitor role usage with CloudTrail
+- Set appropriate session duration
+
+## Exam Tips
+
+### Remember:
+- Roles are **assumed**, not assigned permanently
+- **Instantaneous effect** when attaching/detaching roles
+- Roles can be assumed by multiple entities simultaneously
+- No additional cost for using roles
+
+### Common Question Patterns:
+- "How to give EC2 access to S3 without hardcoding credentials?"
+- "Cross-account access scenarios"
+- "Federated user access to AWS resources"
+- "Lambda function needs to access DynamoDB"
+
+### Key Differences:
+| IAM Users | IAM Roles |
+|-----------|-----------|
+| Permanent credentials | Temporary credentials |
+| Long-term access | Short-term access |
+| For humans/applications | For services/temporary access |
+| Has password/access keys | No permanent credentials |
+
+## CLI Commands to Remember
+
+```bash
+# List current identity
+aws sts get-caller-identity
+
+# Assume a role
+aws sts assume-role --role-arn "arn:aws:iam::account:role/RoleName" --role-session-name "SessionName"
+
+# List roles
+aws iam list-roles
+```
+
+## Quick Review Questions
+1. What happens when you detach an IAM role from an EC2 instance?
+2. How long do temporary credentials last by default?
+3. What service issues temporary credentials when assuming a role?
+4. Can multiple EC2 instances use the same IAM role?
+
+**Answers:**
+1. Access stops immediately
+2. 1 hour (configurable up to 12 hours)
+3. AWS STS (Security Token Service)
+4. Yes, multiple instances can use the same role
