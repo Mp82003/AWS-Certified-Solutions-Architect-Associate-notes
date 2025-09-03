@@ -1,1 +1,14 @@
+Key Points for the Exam:
 
+IAM Components: Users, Groups, Policies, and Roles
+Best Practices: Use groups instead of direct user permissions, avoid root user
+Security Features: MFA, access keys, console sign-in links
+Permission Management: How adding/removing users from groups affects access
+
+Important for SAA Exam:
+
+Principle of Least Privilege - Only grant necessary permissions
+Group-based Management - Always use groups for permission assignment
+Root User Security - Create admin users instead of using root
+Immediate Permission Changes - Removing users from groups instantly revokes access
+.
