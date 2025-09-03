@@ -1,0 +1,141 @@
+# AWS Key Management Service (KMS) - Study Notes
+
+## Overview
+AWS KMS is a **fully managed service** that provides secure and scalable cryptographic key management and encryption across AWS services and applications.
+
+### Key Benefits
+- **Centralized key management** - Control over key generation, storage, and usage
+- **Regulatory compliance** - Helps meet GDPR, HIPAA requirements
+- **Seamless integration** - Works with various AWS services
+- **Data protection** - Encrypts data at rest and in transit
+- **Key rotation** - Automatic or manual key rotation capabilities
+- **Lifecycle management** - Key retirement and deletion
+
+---
+
+## Key Features & Components
+
+### 1. Key Types Supported
+- **Symmetric keys** - Same key for encryption/decryption
+- **Asymmetric keys** - Public/private key pairs
+
+### 2. Key Hierarchy
+```
+AWS Account
+└── Key Rings (logical containers)
+    └── Individual Keys
+```
+
+### 3. Key Identifiers
+- **Globally unique** identifiers for each key
+- Used to reference keys in KMS operations
+- Required for encryption/decryption operations
+- Enable integration with other AWS services
+
+### 4. Key Policies
+- Define **permissions and access controls** for KMS keys
+- Written in **AWS IAM policy language**
+- Determine:
+  - Who can use the keys
+  - What operations can be performed
+  - Under what conditions
+- Can be attached to individual keys or key rings
+- Provide **granular control** over key usage
+
+### 5. Auditing & Logging
+- Logs all key usage activities:
+  - Key creation
+  - Key deletion
+  - Key usage events
+- **CloudTrail integration** for centralized monitoring
+- Enables compliance and audit trails
+
+### 6. Advanced Security Features
+- **AWS CloudHSM integration** - Dedicated hardware security modules
+- **Multi-region replication** - Key availability across regions
+- Enhanced key protection for stringent compliance
+
+---
+
+## Encryption Concepts
+
+### Types of Encryption
+
+#### 1. Symmetric Key Encryption (Secret Key)
+- **Single key** for both encryption and decryption
+- **Faster** than asymmetric encryption
+- Common algorithms: **AES, DES**
+- Key material: sequence of random bits
+- Operating modes:
+  - **Block cipher** - encrypts fixed-size blocks
+  - **Stream cipher** - encrypts bit by bit
+
+#### 2. Asymmetric Key Encryption (Public Key)
+- **Key pair**: public key (encryption) + private key (decryption)
+- Public key freely distributed, private key kept secret
+- Common algorithms: **RSA, ECC (Elliptic Curve Cryptography)**
+- **Computationally expensive** - used for small data amounts
+- Often used for secure key exchange
+
+#### 3. Hybrid Encryption
+- **Combines** symmetric and asymmetric encryption
+- Process:
+  1. Data encrypted with random symmetric key
+  2. Symmetric key encrypted with recipient's public key
+  3. Both sent together
+  4. Recipient decrypts symmetric key with private key
+  5. Uses symmetric key to decrypt data
+- **Best of both worlds** - efficiency + secure key exchange
+
+---
+
+## KMS Encryption/Decryption Process
+
+### Encryption Flow
+1. **Client request** → KMS with plaintext data and CMK specification
+2. **KMS validates** client permissions for specified CMK
+3. **KMS generates** Data Encryption Key (DEK) - symmetric key
+4. **Data encrypted** using DEK → produces ciphertext
+5. **Ciphertext returned** to client for storage/transmission
+
+### Decryption Flow
+1. **Client request** → KMS with ciphertext and CMK specification
+2. **KMS validates** client permissions for specified CMK
+3. **KMS decrypts** ciphertext using specified CMK
+4. **Plaintext data returned** to client
+
+---
+
+## Key Terms & Acronyms
+
+| Term | Full Form | Description |
+|------|-----------|-------------|
+| KMS | Key Management Service | AWS's managed encryption service |
+| CMK | Customer Master Key | Primary key used in KMS |
+| DEK | Data Encryption Key | Symmetric key for actual data encryption |
+| HSM | Hardware Security Module | Dedicated crypto hardware |
+| AES | Advanced Encryption Standard | Symmetric encryption algorithm |
+| RSA | Rivest-Shamir-Adleman | Asymmetric encryption algorithm |
+| ECC | Elliptic Curve Cryptography | Asymmetric encryption method |
+
+---
+
+## Exam Tips
+
+### Remember for SAA-C03:
+1. **KMS is fully managed** - no infrastructure to manage
+2. **Integrates seamlessly** with other AWS services
+3. **Key policies** provide granular access control
+4. **CloudTrail integration** for auditing
+5. **Multi-region replication** for high availability
+6. **Hybrid encryption** combines efficiency with security
+7. **CMK + DEK pattern** - understand the two-tier key structure
+8. **Compliance ready** - helps meet regulatory requirements
+
+### Common Use Cases:
+- Encrypting EBS volumes
+- S3 bucket encryption
+- RDS encryption
+- Lambda environment variables
+- Secrets Manager integration
+- Application-level encryption
