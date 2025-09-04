@@ -139,3 +139,149 @@ AWS Account
 - Lambda environment variables
 - Secrets Manager integration
 - Application-level encryption
+
+# AWS KMS Study Notes - Solutions Architect Exam
+
+## Overview
+AWS Key Management Service (AWS KMS) is a managed service that makes it easy to create and control the cryptographic keys used to encrypt your data.
+
+## Cryptographic Operations Supported
+
+### 1. Symmetric Encryption/Decryption
+- Uses the same key for both encryption and decryption
+- Simpler to manage than asymmetric encryption
+- More efficient for bulk data encryption
+
+### 2. Asymmetric Encryption/Decryption
+- Uses two keys: public key and private key
+- Public key encrypts data, only private key can decrypt
+- More secure but more complex to manage
+- Used for key exchange and digital signatures
+
+### 3. Digital Signatures
+- **Signing**: Uses private key to sign messages/documents
+- **Verifying**: Uses public key to verify signature authenticity
+- Ensures data integrity and non-repudiation
+
+### 4. HMAC (Hash-based Message Authentication Code)
+- Generates and verifies HMAC codes
+- Uses secret key + message to create authentication code
+- Verifies message authenticity and integrity
+
+### 5. Random Number Generation
+- Generates cryptographically secure random numbers
+- Used for session keys and nonces
+- Essential for cryptographic security
+
+## Key Types in AWS KMS
+
+### AWS Managed Keys
+- **Also known as**: AWS Service Keys
+- **Managed by**: AWS KMS automatically
+- **Used for**: Encrypting data in AWS services (S3, EBS, RDS)
+- **Key rotation**: Handled automatically by AWS
+- **Control**: Limited - AWS manages operational aspects
+- **Cost**: No additional charge for the key itself
+
+### Customer Managed Keys (CMKs)
+- **Also known as**: Customer Master Keys
+- **Managed by**: Customer within AWS KMS
+- **Control**: Full control over key lifecycle
+- **Features**: Key rotation, auditing, access control
+- **Usage**: AWS services and custom applications
+
+#### Types of Customer Managed Keys:
+1. **Symmetric CMKs**
+   - Same key for encryption and decryption
+   - Most common type
+   - Used for bulk data encryption
+
+2. **Asymmetric CMKs**
+   - Key pair (public/private keys)
+   - Used for encryption/decryption with different keys
+   - Used for digital signatures
+
+## Access Control
+
+### KMS Key Policies
+- **Purpose**: Control access to specific KMS keys
+- **Scope**: Key-level permissions
+- **Actions**: encrypt, decrypt, create grant, describe key
+- **Applied to**: The CMK directly
+- **Example permissions**:
+  - All access on all KMS keys
+  - Delete key access for specific resources
+
+### IAM Policies
+- **Purpose**: Broader AWS resource access control
+- **Scope**: User, group, and role permissions
+- **Applied to**: IAM identities (users, groups, roles)
+- **Not tied to**: Specific KMS keys
+- **Example**: S3 bucket object access permissions
+
+### Key Differences:
+| Aspect | KMS Key Policies | IAM Policies |
+|--------|------------------|--------------|
+| Scope | Key-specific | Account-wide |
+| Applied to | CMK directly | IAM identities |
+| Focus | Key operations | Resource access |
+| Management | Key-level | Identity-level |
+
+## Pricing Structure
+
+### Key Storage Costs
+- **Customer Managed Keys**: $1 per month (prorated hourly)
+- **Same cost for**: Symmetric, asymmetric, HMAC, multi-region keys
+- **Includes**: Imported key material, CloudHSM, external key store (XKS)
+- **AWS Managed Keys**: No additional charge
+
+### API Request Pricing
+- **Charged per**: Number of API requests
+- **Operations**: Encrypt, decrypt, sign, verify, generate data key
+- **Depends on**: Operation type and key management type
+- **Additional costs**: May apply for other AWS service integration
+
+### Free Tier
+- **Monthly allowance**: 20,000 requests per month
+- **Scope**: Across all regions
+- **Included operations**:
+  - GenerateDataKey
+  - GenerateDataKeyWithoutPlaintext
+  - Sign, verify, encrypt, decrypt (for symmetric keys)
+  - GetPublicKey
+- **Excluded**: Asymmetric key operations
+
+## Pricing Example (S3 Integration)
+**Scenario**: 1 KMS key encrypting 10,000 files, 2M decryptions/month
+
+**Cost Breakdown**:
+- KMS Key: $1.00/month
+- API Requests: 2,010,000 total requests
+- Free tier: -20,000 requests
+- Billable: 1,990,000 requests × $0.03/10,000 = $5.97
+- **Total**: ~$6.97/month
+
+## Key Features
+
+### Additional KMS Features
+- **Key Rotation**: Automatic or manual key rotation
+- **Key Auditing**: CloudTrail integration for key usage logging
+- **Key Policies**: Granular access control
+- **Multi-region Keys**: Keys that work across AWS regions
+- **Custom Key Stores**: CloudHSM and external key store integration
+
+### Integration Benefits
+- **Seamless integration** with AWS services
+- **Centralized key management**
+- **Compliance and auditing** capabilities
+- **Scalable and highly available**
+
+## Exam Tips
+
+1. **Remember the key types**: AWS managed vs Customer managed
+2. **Understand pricing model**: Key storage + API requests
+3. **Know the free tier limits**: 20,000 requests/month
+4. **Policy differences**: KMS key policies vs IAM policies
+5. **Cryptographic operations**: Symmetric vs asymmetric use cases
+6. **Integration scenarios**: How KMS works with S3, EBS, RDS
+7. **Security features**: Digital signatures, HMAC, random number generation
