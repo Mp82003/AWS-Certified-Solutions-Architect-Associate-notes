@@ -114,3 +114,131 @@
 - **High Performance/Gaming**: Use NLB for TCP/UDP
 - **Microservices**: Use ALB with advanced routing rules
 - **Security Appliances**: Use GWLB for third-party tools
+AWS Elastic Load Balancing (ELB) - Study Notes
+For AWS Certified Solutions Architect Exam
+
+Overview
+Elastic Load Balancing (ELB) is an AWS service that distributes incoming application traffic across multiple targets including:
+
+EC2 instances
+Containers
+IP addresses
+Key Benefits
+Increased Availability & Reliability: Protects against single points of failure
+Improved Performance: Routes traffic to closest targets, reducing latency
+Reduced Cost: Auto-scaling based on demand prevents over-provisioning
+Increased Scalability: Easy addition/removal of targets
+Easier Management: Single point of control for traffic distribution
+How ELB Works
+Client Request: Client sends request to application
+ELB Reception: Request first reaches the ELB (single point of contact)
+Health Checks: ELB performs health checks on registered instances
+Load Balancing Algorithm: Determines which healthy instance receives request
+Request Forwarding: ELB forwards request to selected instance
+Response Processing: Instance processes request and sends response back
+Response Forwarding: ELB forwards response back to client
+Health Checks
+Verify instances are responding properly
+Ensure instances are capable of serving requests
+Unhealthy instances automatically removed from rotation
+Load Balancing Algorithms
+Round Robin
+Least Outstanding Request
+IP Hash-based
+Types of Load Balancers
+1. Classic Load Balancer (CLB) ⚠️
+Layer: Layer 4 (Transport Layer)
+Status: Original ELB service, still supported but NOT recommended
+Routing: Based on IP addresses and port information
+Use Case: Simple TCP or SSL traffic balancing
+Exam Note: CLB has no weight in current AWS exams - focus on ALB and NLB
+2. Network Load Balancer (NLB)
+Layer: Layer 4 (Transport Layer)
+Protocols: TCP, UDP, TLS
+Performance: High performance, low latency, high throughput
+Optimization: Specifically optimized for TCP/UDP/TLS traffic
+NLB Components:
+Load Balancer: Central component, single entry point
+Target Groups: Logical groupings of backend instances (EC2, IP addresses, Lambda)
+Listeners: Receive and route connections based on protocol and port
+3. Application Load Balancer (ALB) ⭐
+Layer: Layer 7 (Application Layer)
+Protocols: HTTP, HTTPS
+Intelligence: Makes routing decisions based on HTTP/HTTPS request content
+Session Stickiness: Supports binding user sessions to specific targets
+ALB Components:
+Load Balancer: Operates at application layer for intelligent routing
+Target Groups: Route requests to EC2 instances, IP addresses, containers, or Lambda
+Listeners: Support HTTP/HTTPS protocols and port numbers
+Rules: ⚠️ UNIQUE TO ALB - Advanced routing based on:
+URL paths
+Host names
+Header values
+ALB Advanced Features:
+Content-based routing
+Header inspection
+Dynamic target registration
+Microservices architecture support
+4. Gateway Load Balancer (GWLB)
+Layer: Layer 3 (Network Layer)
+Purpose: Load balancing for third-party virtual appliances
+Function: Entry/exit point for VPC traffic
+GWLB Components:
+Load Balancer: Central component for VPC traffic entry/exit
+Target Groups: Logical groupings of virtual appliances
+Listeners: Support TCP/UDP protocols
+Virtual Appliances: Third-party network functions including:
+Firewalls
+Intrusion Detection/Prevention Systems (IDPS)
+Deep Packet Inspection (DPI) systems
+Security/monitoring tools
+Endpoints: IP address or DNS serving as entry point for traffic
+Exam Tips & Key Points
+High-Priority for Exam:
+ALB vs NLB: Know when to use each
+ALB: Layer 7, HTTP/HTTPS, content-based routing
+NLB: Layer 4, TCP/UDP/TLS, high performance
+ALB Rules: Only ALB has advanced routing rules
+Target Groups: All modern ELBs use target groups
+Health Checks: Critical for high availability
+Session Stickiness: ALB feature for maintaining user sessions
+Remember:
+Classic Load Balancer is legacy - focus on ALB/NLB
+Gateway Load Balancer is for third-party virtual appliances
+ELB provides automatic scaling and high availability
+All traffic is encrypted using SSL/TLS
+Cross Zone Load Balancing ⭐
+Cross Zone Load Balancing is a critical ELB feature that distributes traffic across multiple Availability Zones within a single AWS region.
+
+How It Works
+Load Balancer Nodes: ELB has load balancer nodes in each AZ
+Traffic Distribution: Each node can route traffic to instances in ANY AZ
+Fault Tolerance: If one AZ becomes unavailable, traffic continues to other AZs
+Even Distribution: Ensures balanced load across all registered instances regardless of AZ
+Architecture Example
+AZ-A: ELB Node → Can route to instances in AZ-A OR AZ-B
+AZ-B: ELB Node → Can route to instances in AZ-A OR AZ-B
+Benefits ✅
+Improved Availability: Protects against single AZ failure
+Better Performance: Routes traffic to closest/healthiest instances
+Reduced Cost: Prevents over-provisioning through better resource utilization
+Fault Tolerance: Application remains available even if entire AZ goes down
+Limitations ⚠️
+Increased Complexity: Must ensure EC2 instances are distributed across multiple AZs
+Higher Costs: Pay for ELB nodes and EC2 instances in multiple AZs
+Cross-AZ Data Transfer: May incur additional data transfer charges
+Exam Key Points
+Default Behavior: Varies by load balancer type
+ALB: Cross-zone load balancing is ALWAYS enabled (cannot be disabled)
+NLB: Cross-zone load balancing is DISABLED by default (can be enabled)
+CLB: Cross-zone load balancing is DISABLED by default (can be enabled)
+Common Exam Scenarios:
+Web Applications: Use ALB for HTTP/HTTPS traffic
+High Performance/Gaming: Use NLB for TCP/UDP
+Microservices: Use ALB with advanced routing rules
+Security Appliances: Use GWLB for third-party tools
+Multi-AZ High Availability: Enable cross-zone load balancing for better fault tolerance
+
+
+
+
