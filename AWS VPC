@@ -1,0 +1,162 @@
+What is VPC?
+
+Amazon Virtual Private Cloud (VPC): Logically isolated virtual network in AWS
+Your own personal section of AWS Cloud
+Complete control over networking environment
+Default VPC: Every AWS account has one (cannot be deleted)
+Region-bound: Each VPC exists entirely within one region
+
+Key VPC Components
+1. Internet Gateway (IGW)
+
+Connects VPC to public internet
+One IGW per VPC
+Required for public subnet internet access
+
+2. Subnets
+
+Definition: Range of IP addresses within VPC
+Purpose: Segment VPC into smaller networks
+Location: Each subnet resides in one Availability Zone
+Types:
+
+Public Subnet: Has route to Internet Gateway
+Private Subnet: No direct internet access
+
+
+
+3. Route Tables
+
+Control traffic flow within VPC and to external networks
+Default route table: Comes with every VPC
+Association: Each subnet must be associated with one route table
+Key Routes:
+
+0.0.0.0/0 → Internet Gateway (for public access)
+10.0.0.0/16 → Local (for internal VPC traffic)
+
+
+
+4. Network ACLs (NACLs)
+
+Subnet-level firewall
+Additional security layer
+One default NACL per VPC
+Stateless (must configure both inbound and outbound rules)
+
+5. NAT Gateway
+
+Enables outbound internet access for private subnets
+Must be placed in public subnet
+Prevents inbound internet traffic to private resources
+Private route table needs: 0.0.0.0/0 → NAT Gateway
+
+6. Security Groups
+
+Instance-level firewall
+First line of defense for EC2 instances
+Stateful (automatic return traffic)
+
+VPC Connectivity Options
+VPC Peering
+
+Direct private communication between VPCs
+Works across regions
+Cost-effective and secure
+No internet gateway required
+
+VPN Connections
+
+Secure connection to on-premises networks
+Options: Site-to-Site VPN, AWS Client VPN, Direct Connect
+
+Transit Gateway
+
+Central hub for routing traffic
+Connects multiple VPCs and on-premises networks
+Regional service
+Simplifies network management
+
+Subnet Deep Dive
+Characteristics
+
+Defined using CIDR notation (e.g., 10.0.1.0/24)
+Must be associated with one Availability Zone
+Cannot span multiple AZs
+Enhance fault tolerance when distributed across AZs
+
+Types & Use Cases
+
+Public Subnets: Web servers, load balancers, NAT gateways
+Private Subnets: Databases, application servers, internal services
+
+Routing Behavior
+
+Public Subnet: Route table has route to Internet Gateway
+Private Subnet: Route table lacks Internet Gateway route
+Custom route tables enable fine-grained traffic control
+
+Exam Key Points
+
+VPC is region-specific, subnets are AZ-specific
+Default VPC cannot be deleted
+One subnet = One AZ (but one AZ can have multiple subnets)
+Security Groups are stateful, NACLs are stateless
+NAT Gateway must be in public subnet for private subnet internet access
+Route table association determines if subnet is public or private
+
+
+# AWS VPC - Quick Exam Notes
+
+## VPC Basics
+- **VPC**: Logically isolated virtual network in AWS
+- **Scope**: Region-specific (cannot span regions)
+- **Default VPC**: Auto-created, cannot be deleted
+- **Custom VPC**: Full control over IP ranges, subnets, routing
+
+## Core Components
+
+### Internet Gateway (IGW)
+- One per VPC
+- Enables internet access for public subnets
+
+### Subnets
+- **Public**: Route to IGW (0.0.0.0/0 → IGW)
+- **Private**: No IGW route
+- **Rule**: 1 subnet = 1 AZ (but 1 AZ can have multiple subnets)
+
+### Route Tables
+- Default route table per VPC
+- Each subnet = exactly 1 route table
+- Determines public vs private subnet behavior
+
+### Security
+- **Security Groups**: Instance-level, stateful
+- **NACLs**: Subnet-level, stateless
+
+### NAT Gateway
+- Public subnet placement required
+- Enables private subnet outbound internet access
+- Private route: 0.0.0.0/0 → NAT Gateway
+
+## Connectivity
+
+### VPC Peering
+- Direct VPC-to-VPC connection
+- Cross-region supported
+- No IGW needed
+
+### VPN/Direct Connect
+- On-premises connectivity
+- Secure encrypted connections
+
+### Transit Gateway
+- Central hub for multiple VPCs
+- Regional service
+
+## Exam Essentials
+- **Stateful**: Security Groups (automatic return traffic)
+- **Stateless**: NACLs (manual inbound/outbound rules)
+- **Public subnet criteria**: Route table with IGW route
+- **Private internet access**: NAT Gateway in public subnet
+- **High availability**: Distribute subnets across multiple AZs
