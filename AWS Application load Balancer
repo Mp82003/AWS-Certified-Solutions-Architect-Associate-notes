@@ -1,0 +1,1013 @@
+# AWS Solutions Architect Associate Exam Notes
+## Elastic Load Balancer (ELB) Stickiness
+
+> **Exam Weight:** High - Expect 3-5 questions on ALB stickiness concepts
+
+### Overview of Elastic Load Balancers
+
+**Core Function:**
+- Automatically distribute incoming application traffic across multiple EC2 instances
+- Enable fault tolerance, high availability, and auto-scaling capabilities
+- Use health checks to route traffic only to healthy instances
+- **Key Exam Point:** ELBs only route to healthy targets based on health checks
+
+### Types of Load Balancers
+
+#### 1. Application Load Balancer (ALB) ⭐ Most Important
+- **Primary Use:** Request-level operations (Layer 7)
+- **Best For:** Microservices, containers, web services, websites
+- **Key Features:** 
+  - Advanced routing and visibility features
+  - Path-based and host-based routing
+  - Support for HTTP/HTTPS protocols
+- **Exam Focus:** 80% of load balancer questions focus on ALBs
+- **Stickiness:** Primary focus for stickiness questions
+
+#### 2. Network Load Balancer (NLB)
+- **Primary Use:** Ultra-high performance applications (Layer 4)
+- **Key Features:** 
+  - TLS offloading at scale
+  - Centralized certificate deployment
+  - UDP support
+  - Static IP addresses
+  - Millions of requests per second
+- **Performance:** Think "high performance, very fast"
+
+#### 3. Gateway Load Balancer
+- **Primary Use:** Deploy/manage third-party virtual appliances with GENEVE support
+- **Use Cases:** Firewalls, intrusion detection systems
+- **Exam Relevance:** Low probability of exam questions
+
+#### 4. Classic Load Balancer (CLB) - Deprecated ❌
+- **Status:** Previous generation, Amazon discourages use
+- **Exam Relevance:** Unlikely to appear on current exams
+- **Note:** Can have stickiness but not exam-relevant
+
+---
+
+## ELB Stickiness (Session Affinity) 🔑
+
+### What is Stickiness?
+
+**Definition:** Routes requests from the same client to the same target within a target group to maintain session state
+
+**Target Group Components:**
+- EC2 instances serving your application
+- Lambda functions serving APIs/microservices  
+- Other compute targets
+
+**Session State Requirement:** Used with servers that maintain state information for continuous user experience
+
+### Real-World Use Cases
+
+**Primary Scenarios:**
+- **Shopping Cart Applications:** Track items across multiple requests
+- **Multi-step Forms:** Maintain form data across pages
+- **User Authentication Sessions:** Keep login state consistent
+- **File Upload Progress:** Track upload status across requests
+
+**Client Requirements:**
+- Client/browser **must support cookies**
+- Session tracking via cookie exchange between client and load balancer
+
+### How Stickiness Works - Visual Concept
+
+#### Scenario: E-commerce Shopping Cart
+
+**Without Stickiness (Problem):**
+```
+User Request 1 → ALB → Server A (adds item to cart)
+User Request 2 → ALB → Server B (cart appears empty!)
+User Request 3 → ALB → Server A (cart reappears)
+Result: Inconsistent user experience
+```
+
+**With Stickiness (Solution):**
+```
+User Request 1 → ALB → Server A (generates AWS ALB cookie)
+User Request 2 → ALB → Server A (cookie routes to same server)
+User Request 3 → ALB → Server A (session maintained)
+Result: Consistent shopping cart experience
+```
+
+#### Technical Flow:
+1. **First Request:** ALB receives HTTP request, routes to target, generates `AWS ALB` cookie
+2. **Cookie Response:** ALB sends cookie back to client with target information
+3. **Subsequent Requests:** Client includes cookie, ALB routes to same target
+4. **Session Maintenance:** State preserved across entire user journey
+
+### Advanced Stickiness Behaviors
+
+#### Target Failure Handling:
+- **Scenario:** Cookie references unhealthy/deregistered target
+- **ALB Response:** Automatically selects new healthy target
+- **Cookie Update:** Updates cookie with new target information
+- **User Impact:** Seamless failover with minimal session disruption
+
+#### Session Duration Management:
+- **Configuration:** Set duration in seconds at target group level
+- **Renewal Mechanism:** Duration resets with each client request
+- **Example:** 1-hour stickiness + client activity = session extends another hour
+- **Session Death:** No activity within duration = session expires
+
+#### Duration Best Practices:
+- **Short Sessions:** 15-30 minutes for security-sensitive applications
+- **Long Sessions:** 1-8 hours for shopping/productivity applications
+- **Consider:** Balance between user experience and server resource distribution
+
+### Cookie Technical Details 🍪
+
+#### Primary Stickiness Cookies:
+- **Standard Cookie:** `AWS ALB` 
+- **CORS Cookie:** `AWS ALB CORS` (cross-origin resource sharing)
+
+#### Security Features:
+- **Encryption:** Contents encrypted using rotating keys
+- **Immutability:** Cannot decrypt, modify, or tamper with cookies
+- **Generation:** Only ALB-generated cookies supported
+- **Rotation:** Keys automatically rotated for enhanced security
+
+#### Cookie Headers:
+- **Time Attribute:** Uses `expires` attribute (NOT `Max-Age`)
+- **CORS Requirements:** Some browsers need `SameSite=None; Secure` header
+- **Dual Cookie Response:** CORS environments receive both cookies
+
+#### Unsupported Features:
+- **URL Encoding:** ALB does NOT support URL-encoded cookie values
+- **Custom Cookies:** Only load balancer-generated cookies work
+- **Cookie Modification:** Cannot alter cookie contents client-side
+
+---
+
+## Critical Exam Knowledge ⚠️
+
+### ALB-Specific Stickiness Rules:
+
+#### Cookie Limitations:
+- ✅ **Supported:** Only ALB-generated cookies (`AWS ALB`, `AWS ALB CORS`)
+- ❌ **Not Supported:** Custom application cookies, URL-encoded values
+- 🔒 **Security:** Encrypted with rotating keys, cannot be modified
+- 📅 **Headers:** Uses `expires` attribute, NOT `Max-Age` header
+
+#### Multi-Layer ALB Restrictions:
+- **Rule:** Can only enable stickiness on ONE layer when using multiple ALBs
+- **Reason:** All ALBs use identical cookie names
+- **Exam Trap:** Questions about stickiness across ALB tiers
+
+#### Forward Action Requirements:
+- **Scenario:** Forward action with multiple target groups
+- **Rule:** If ANY target group has stickiness enabled, must enable target group stickiness
+- **Configuration:** Target group-level setting required
+
+### WebSocket Special Behavior:
+
+#### Inherent Stickiness:
+- **Nature:** WebSocket connections are automatically sticky
+- **Upgrade Process:** Target returning HTTP 101 status becomes permanent target
+- **Post-Upgrade:** Cookie-based stickiness becomes irrelevant
+- **Exam Point:** WebSockets have built-in session affinity
+
+### Common Exam Trap Scenarios:
+
+#### Scenario 1: URL-Encoded Cookies
+```
+Question: "Why isn't stickiness working with URL-encoded cookie values?"
+Answer: ALB does not support URL-encoded cookie values
+```
+
+#### Scenario 2: Multi-Layer ALB Stickiness
+```
+Question: "Can you enable stickiness on both ALB layers?"
+Answer: No, only one layer due to identical cookie naming
+```
+
+#### Scenario 3: Custom Cookie Integration
+```
+Question: "How to use application-generated session cookies with ALB?"
+Answer: Cannot use custom cookies, only ALB-generated cookies supported
+```
+
+#### Scenario 4: WebSocket + Stickiness
+```
+Question: "Do you need to configure stickiness for WebSocket applications?"
+Answer: No, WebSocket connections are inherently sticky after upgrade
+```
+
+---
+
+## Exam Strategy & Practice Questions 🎯
+
+### High-Probability Question Types:
+
+#### 1. Stickiness Use Cases (40% of questions)
+**Question Pattern:** "A web application needs to maintain user session state..."
+- **Key Words:** shopping cart, session state, multi-step process
+- **Answer Focus:** Enable ALB stickiness for session continuity
+
+#### 2. Cookie Behavior (30% of questions)  
+**Question Pattern:** "What cookie does ALB generate for sticky sessions?"
+- **Correct Answers:** `AWS ALB` and `AWS ALB CORS`
+- **Wrong Answers:** Custom cookie names, `JSESSIONID`, `AWSELB`
+
+#### 3. Technical Limitations (20% of questions)
+**Question Pattern:** "Why isn't stickiness working with [specific scenario]?"
+- **Common Issues:** URL-encoded cookies, multiple ALB layers, custom cookies
+- **Solution Pattern:** Identify unsupported configuration
+
+#### 4. WebSocket Integration (10% of questions)
+**Question Pattern:** "How does stickiness work with WebSocket connections?"
+- **Key Point:** WebSockets are inherently sticky, no cookie configuration needed
+
+### Memory Techniques:
+
+#### Cookie Names Mnemonic:
+- **AWS ALB** = "**A**WS **A**pplication **L**oad **B**alancer"
+- **AWS ALB CORS** = Same + "**C**ross-**O**rigin **R**esource **S**haring"
+
+#### Limitation Mnemonics:
+- **"ONE Layer Only"** = Multiple ALB layers can't all have stickiness
+- **"No URL Cookies"** = URL-encoded values not supported
+- **"Expires Not Max"** = Uses `expires` attribute, not `Max-Age`
+
+### Quick Reference Cheat Sheet:
+
+| Topic | Key Point | Exam Answer |
+|-------|-----------|-------------|
+| Cookie Names | What cookies does ALB generate? | `AWS ALB` and `AWS ALB CORS` |
+| Multiple ALBs | Can both layers have stickiness? | No, only one layer |
+| URL Encoding | Supports URL-encoded cookies? | No, not supported |
+| WebSockets | Need stickiness configuration? | No, inherently sticky |
+| Duration | How is session duration managed? | Resets with each request |
+| Security | Can you modify ALB cookies? | No, encrypted and immutable |
+
+---
+
+## Hands-On Lab Concepts 🧪
+
+### Lab Objectives Understanding:
+- **Create ALB** with target group containing multiple EC2 instances
+- **Configure stickiness** duration settings at target group level  
+- **Test session persistence** across multiple requests
+- **Observe cookie behavior** in browser developer tools
+- **Demonstrate failover** when target becomes unhealthy
+
+### Expected Lab Outcomes:
+- **Without Stickiness:** Requests randomly distributed across instances
+- **With Stickiness:** All requests from same client hit same instance
+- **Cookie Inspection:** See `AWS ALB` cookie in browser headers
+- **Duration Testing:** Session persists based on configured timeout
+
+---
+
+## Final Exam Prep Checklist ✅
+
+### Must Remember:
+- [ ] ALB stickiness uses `AWS ALB` and `AWS ALB CORS` cookies
+- [ ] Only one layer can have stickiness in multi-ALB setup
+- [ ] URL-encoded cookie values are NOT supported
+- [ ] WebSocket connections are inherently sticky
+- [ ] Cookies use `expires` attribute, not `Max-Age`
+- [ ] Stickiness configured at target group level
+- [ ] Duration resets with each client request
+- [ ] Automatic failover to healthy targets
+
+### Practice Focus Areas:
+- Shopping cart/session state scenarios
+- Multi-layer ALB configuration questions  
+- WebSocket + stickiness behavior
+- Cookie technical limitations
+- Target failure and recovery processes
+
+**Study Time Recommendation:** 45-60 minutes for thorough review
+
+# AWS Solutions Architect Associate Exam Notes
+## Application Load Balancers (ALB)
+
+> **Exam Weight:** Very High - Expect 8-12 questions on ALB concepts, routing, and integrations
+
+---
+
+## Overview: What are Load Balancers?
+
+**AWS Implementation:** Elastic Load Balancers (ELBs)
+- **Core Function:** Automatically distribute incoming traffic across multiple targets
+- **Supported Targets:** EC2 instances, ECS containers, Lambda functions, IP addresses
+- **Health Monitoring:** Routes traffic only to healthy targets
+- **Auto Scaling:** Automatically scales to handle varying workloads
+- **Multi-AZ Support:** Distributes across multiple Availability Zones for high availability
+
+---
+
+## Four Types of Elastic Load Balancers
+
+### 1. Application Load Balancer (ALB) ⭐ PRIMARY EXAM FOCUS
+- **OSI Layer:** Layer 7 (Application Layer)
+- **Protocols:** HTTP, HTTPS
+- **Operation Level:** Request level
+- **Best For:** Web applications, microservices, containers (ECS/EKS)
+- **Key Features:** Advanced routing, path-based routing, host-based routing
+- **Exam Weight:** Highest - most ALB questions focus here
+
+### 2. Network Load Balancer (NLB) 
+- **OSI Layer:** Layer 4 (Transport Layer)
+- **Protocols:** TCP, TLS, UDP
+- **Operation Level:** Connection level
+- **Performance:** Millions of requests per second, ultra-low latency
+- **Key Features:** 
+  - TLS offloading at scale
+  - Centralized certificate deployment
+  - Static IP addresses
+  - UDP support
+- **Use Cases:** Ultra-high performance applications
+
+### 3. Gateway Load Balancer
+- **OSI Layer:** Layer 3 (Network Layer) 
+- **Protocol:** IP (GENEVE)
+- **Primary Use:** Third-party virtual appliances
+- **Examples:** Firewalls, intrusion detection systems, deep packet inspection
+- **Exam Relevance:** Low probability, but know it exists
+
+### 4. Classic Load Balancer (CLB) ❌ DEPRECATED
+- **Status:** Previous generation, AWS discourages use
+- **Use Case:** EC2-Classic networks (no VPCs)
+- **Exam Relevance:** Very rare, mostly legacy scenarios
+
+---
+
+## Application Load Balancer Deep Dive
+
+### Core Concepts
+
+#### ALB Architecture:
+- **Single Point of Contact:** Clients connect to one ALB endpoint
+- **Multi-AZ Requirement:** Must deploy across at least 2 Availability Zones
+- **Traffic Distribution:** Spreads requests across targets in multiple AZs
+- **High Availability:** Increases application availability through redundancy
+
+#### Key Components:
+
+**1. Listeners**
+- Listen on defined ports and protocols
+- Evaluate requests against routing rules
+- Forward traffic based on rule matches
+- Must have at least one default action
+
+**2. Rules**
+- Have priority order (1, 2, 3, etc.)
+- Include one or more conditions (path, host, headers)
+- Include one or more actions (forward, redirect, authenticate)
+- Default rule catches unmatched requests
+
+**3. Target Groups**
+- Logical grouping of targets (EC2, containers, Lambda, IP)
+- Health checks performed per target group
+- Routing algorithms: Round Robin (default) or Least Outstanding Requests
+- Targets can belong to multiple target groups
+
+### ALB Request Processing Flow:
+```
+1. Client Request → ALB
+2. Listener evaluates rules by priority
+3. Rule condition matches → Action executes
+4. Target selected from target group
+5. Request forwarded to healthy target
+6. Response returned to client
+```
+
+---
+
+## Advanced ALB Features & Routing
+
+### Path-Based Routing 🛣️
+**Example Scenario:**
+- `/api/*` → API Target Group (microservices)
+- `/images/*` → Static Content Target Group 
+- `/videos/*` → Video Processing Target Group
+- `/*` → Default Web Target Group
+
+**Exam Pattern:** Questions about routing different URL paths to different services
+
+### Host-Based Routing
+**Example Scenario:**
+- `api.example.com` → API Target Group
+- `www.example.com` → Web Target Group
+- `admin.example.com` → Admin Target Group
+
+### Routing Algorithms:
+1. **Round Robin (Default):** Distributes requests evenly across targets
+2. **Least Outstanding Requests:** Routes to target with fewest active requests
+
+---
+
+## Critical ALB Integrations for Exam
+
+### 1. ALB + Route 53 Health Checks
+- **Active/Passive Failover:** Route 53 can failover between ALBs
+- **Health Check Integration:** Route 53 monitors ALB health
+- **Multi-Region Setup:** Primary region ALB fails → backup region ALB
+
+### 2. ALB as CloudFront Origin
+- **Architecture:** CloudFront → ALB → Target Groups
+- **Benefits:** Global content distribution, caching, DDoS protection
+- **Use Cases:** Global web applications, API acceleration
+
+### 3. ALB + AWS Global Accelerator ⚡
+**What is Global Accelerator:**
+- Improves performance for local and global users
+- Uses AWS Global Network (faster than public internet)
+- Provides static IP addresses for applications
+
+**Two Types:**
+1. **Standard Accelerator:** 
+   - Routes traffic to optimal regional endpoint
+   - Based on health, client location, policies
+   - Endpoints: NLB, ALB, EC2, Elastic IP
+
+2. **Custom Routing Accelerator:**
+   - Maps users to specific destinations
+   - More granular traffic control
+
+**ALB Integration:**
+- ALB can be Global Accelerator endpoint
+- Provides static IPs and improved performance
+- Instant reaction to health/configuration changes
+
+### 4. ALB vs NLB Decision Matrix 📊
+
+| Scenario | Choose ALB | Choose NLB |
+|----------|------------|------------|
+| Protocol | HTTP/HTTPS | TCP/TLS/UDP |
+| Routing Needs | Path/Host-based | Connection-based |
+| Performance | Standard web apps | Ultra-high performance |
+| IP Requirements | Dynamic | Static IP needed |
+| Use Cases | Web apps, APIs, microservices | Gaming, IoT, real-time apps |
+
+### 5. ALB + ECS Fargate
+**Architecture:** ALB → ECS Service → Fargate Tasks
+- **Dynamic Port Mapping:** ALB routes to dynamic container ports
+- **Service Discovery:** Automatic registration/deregistration
+- **Health Checks:** Container-level health monitoring
+- **Scaling Integration:** Works with ECS auto-scaling
+
+---
+
+## Session Management Strategies
+
+### 1. Sticky Sessions (Session Cookies)
+- **How:** ALB generates session cookies
+- **Pros:** Simple to implement
+- **Cons:** Session lost if target becomes unhealthy
+- **Use Cases:** Simple applications with server-side state
+
+### 2. ElastiCache for Session Management ⭐ PREFERRED
+**Architecture:**
+```
+Client → ALB → EC2/Fargate → ElastiCache Redis
+```
+
+**Process Flow:**
+1. User login → Target validates credentials
+2. Target creates session in ElastiCache Redis
+3. Returns session cookie to client
+4. Subsequent requests use cookie
+5. Any target can retrieve session from ElastiCache
+
+**Benefits:**
+- **Resilient:** Session survives target failures
+- **Scalable:** Supports multiple target groups
+- **Flexible:** Easy to add/remove targets
+- **Performance:** Fast Redis lookups
+
+**Exam Pattern:** Compare sticky sessions vs ElastiCache scenarios
+
+---
+
+## Exam Question Patterns & Strategies
+
+### High-Probability Question Types:
+
+#### 1. ALB Routing Scenarios (35%)
+**Pattern:** "Route requests based on URL path to different services"
+- **Keywords:** path-based routing, microservices, /api/, /images/
+- **Answer Focus:** Configure listener rules with path conditions
+
+#### 2. ALB vs NLB Selection (25%)
+**Pattern:** "Which load balancer for [specific scenario]?"
+- **HTTP/HTTPS scenario** → ALB
+- **Ultra-high performance/static IP** → NLB
+- **Gaming/real-time applications** → NLB
+
+#### 3. Global Performance Optimization (20%)
+**Pattern:** "Improve performance for global users"
+- **Keywords:** global users, performance, latency
+- **Solution:** Global Accelerator + ALB
+
+#### 4. Session Management (15%)
+**Pattern:** "Shopping cart loses items when switching servers"
+- **Problem:** Sticky sessions with target failure
+- **Solution:** ElastiCache Redis for session storage
+
+#### 5. Multi-Region Failover (5%)
+**Pattern:** "Automatic failover between regions"
+- **Solution:** Route 53 health checks + multiple ALBs
+
+### Memory Techniques:
+
+#### ALB vs NLB Mnemonic:
+- **ALB = "Application"** → HTTP/HTTPS web **applications**
+- **NLB = "Network"** → TCP/UDP **network** protocols
+
+#### Layer Memory:
+- **ALB = Layer 7** → "**A**pplication **L**ayer 7"
+- **NLB = Layer 4** → "**N**etwork **L**ayer 4" (Transport)
+
+#### Global Accelerator Features:
+- **"Global Network"** → Uses AWS backbone, faster than internet
+- **"Static IPs"** → Provides fixed IP addresses
+- **"Instant Health"** → Instant reaction to health changes
+
+---
+
+## Lab Architecture Understanding
+
+### Demo Environment:
+```
+Internet → ALB → [Listeners with Rules]
+                    ↓
+            [Target Groups]
+            /            \
+    Web Target Group   Video Target Group
+      (Orange, Blue)     (Red, Green)
+```
+
+### Key Lab Concepts:
+- **Path-Based Routing:** `/web/*` and `/video/*` paths
+- **Multi-AZ Deployment:** Targets across different AZs
+- **Security Groups:** Port 80 open for HTTP traffic
+- **Public IPs:** EC2 instances accessible via ALB
+- **CLI Implementation:** AWS CLI commands for automation
+
+### Expected Lab Outcomes:
+- **Routing Verification:** Different paths hit different target groups
+- **Health Check Testing:** Unhealthy targets automatically excluded
+- **Load Distribution:** Requests distributed across healthy targets
+- **Rule Priority:** Higher priority rules evaluated first
+
+---
+
+## Quick Reference Cheat Sheet
+
+| Component | Key Points | Exam Focus |
+|-----------|------------|------------|
+| **ALB Basics** | Layer 7, HTTP/HTTPS, request-level | High |
+| **Multi-AZ** | Minimum 2 AZs required | Medium |
+| **Target Groups** | Health checks, routing algorithms | High |
+| **Path Routing** | `/api/*`, `/images/*` patterns | Very High |
+| **Global Accelerator** | Static IPs, AWS Global Network | Medium |
+| **ElastiCache Sessions** | Resilient session management | High |
+| **Route 53 Integration** | Active/passive failover | Medium |
+
+---
+
+## Final Exam Prep Checklist ✅
+
+### Must Remember:
+- [ ] ALB operates at Layer 7 (Application Layer)
+- [ ] Requires minimum 2 Availability Zones
+- [ ] Path-based and host-based routing capabilities
+- [ ] Global Accelerator provides static IPs and performance
+- [ ] ElastiCache Redis preferred over sticky sessions
+- [ ] Can be CloudFront origin and Route 53 target
+- [ ] Round Robin vs Least Outstanding Requests algorithms
+- [ ] Integration with ECS Fargate for containers
+
+### Common Exam Traps:
+- Confusing ALB (Layer 7) with NLB (Layer 4)
+- Forgetting multi-AZ requirement for ALB
+- Choosing sticky sessions over ElastiCache
+- Missing Global Accelerator for global performance questions
+
+# AWS Solutions Architect Associate Exam Notes
+## Application Load Balancer - Hands-On Lab & CLI Commands
+
+> **Exam Weight:** High - Understanding CLI commands and lab architecture demonstrates deep ALB knowledge
+
+---
+
+## Lab Architecture Overview
+
+### What We Built:
+```
+Internet → ALB (DNS Name) → Listeners → Target Groups
+                              ↓
+                    Path-Based Routing:
+                    - Default (/) → Web Target Group
+                    - /vid/* → Video Target Group
+                    
+Web Target Group:           Video Target Group:
+- Web Server 1 (Orange)     - Video Server 1 (Red)
+- Web Server 2 (Blue)       - Video Server 2 (Green)
+```
+
+### Key Components Created:
+- **1 ALB** across 2 Availability Zones
+- **2 Target Groups** (Web and Video)
+- **4 EC2 Instances** (2 per target group)
+- **2 Custom Subnets** (1 per AZ)
+- **1 Security Group** (ports 22, 80)
+- **2 Listener Rules** (default + path-based)
+
+---
+
+## Prerequisites & Setup
+
+### Required Information:
+1. **VPC ID:** Your default VPC identifier
+2. **CIDR Block:** VPC IP range (e.g., 172.31.0.0/16)
+3. **AMI ID:** Amazon Linux 2 free tier AMI
+4. **Key Pair:** Existing EC2 key pair for SSH access
+5. **Your IP Address:** For security group SSH access
+
+### Environment Variables Strategy:
+```bash
+# Export key values as variables for reuse
+export VPC="vpc-xxxxxxxxx"
+export SGID="sg-xxxxxxxxx" 
+export AZ1SUB="subnet-xxxxxxxxx"
+export AZ2SUB="subnet-xxxxxxxxx"
+export ALBORN="arn:aws:elasticloadbalancing:..."
+export ALBDNS="my-alb-xxxxxxxxx.us-east-1.elb.amazonaws.com"
+```
+
+**Exam Tip:** Understanding environment variables shows advanced CLI knowledge
+
+---
+
+## Step-by-Step CLI Implementation
+
+### Phase 1: Security Group Creation
+
+#### Create Security Group:
+```bash
+aws ec2 create-security-group \
+    --group-name "ALB-Security-Group" \
+    --description "Security group for ALB lab" \
+    --vpc-id $VPC
+```
+
+#### Configure Security Group Rules:
+```bash
+# SSH access from your IP only
+aws ec2 authorize-security-group-ingress \
+    --group-id $SGID \
+    --protocol tcp \
+    --port 22 \
+    --cidr $IPADD/32
+
+# HTTP access from anywhere
+aws ec2 authorize-security-group-ingress \
+    --group-id $SGID \
+    --protocol tcp \
+    --port 80 \
+    --cidr 0.0.0.0/0
+```
+
+**Exam Focus:** Security group configuration for ALB access patterns
+
+### Phase 2: Subnet Creation
+
+#### Subnet Requirements:
+- **Minimum 2 AZs:** ALB requirement
+- **Different CIDR blocks:** Non-overlapping IP ranges
+- **Upper IP ranges:** Avoid conflicts with existing subnets
+
+```bash
+# Subnet 1 - AZ1
+aws ec2 create-subnet \
+    --vpc-id $VPC \
+    --availability-zone us-east-1a \
+    --cidr-block 172.31.128.0/20
+
+# Subnet 2 - AZ2  
+aws ec2 create-subnet \
+    --vpc-id $VPC \
+    --availability-zone us-east-1b \
+    --cidr-block 172.31.192.0/20
+```
+
+**Exam Tip:** Remember ALB requires minimum 2 AZs with separate subnets
+
+### Phase 3: EC2 Instance Creation
+
+#### Key Parameters:
+- **AMI:** Amazon Linux 2 (free tier)
+- **Instance Type:** t2.micro (free tier)
+- **Public IP:** Required for internet access
+- **User Data:** Automated web server setup
+
+#### User Data Script Example:
+```bash
+#!/bin/bash
+sudo su
+yum install httpd -y
+cd /var/www/html
+mkdir vid
+echo '<html><body bgcolor="red"><h1>Hello from EC2 Video Server 1</h1></body></html>' > vid/index.html
+echo '<html><body bgcolor="red"><h1>Video Content Here</h1></body></html>' > vid/video.html
+service httpd start
+chkconfig httpd on
+```
+
+#### Instance Creation Command:
+```bash
+aws ec2 run-instances \
+    --image-id $AMI \
+    --count 1 \
+    --instance-type t2.micro \
+    --key-name ALB-KeyPair \
+    --security-group-ids $SGID \
+    --subnet-id $AZ1SUB \
+    --associate-public-ip-address \
+    --user-data file://user-data-video-server-1.txt
+```
+
+**Exam Pattern:** Questions about user data automation and instance configuration
+
+### Phase 4: Application Load Balancer Creation
+
+```bash
+aws elbv2 create-load-balancer \
+    --name "My-ALB" \
+    --subnets $AZ1SUB $AZ2SUB \
+    --security-groups $SGID
+```
+
+**Key Points:**
+- **Multi-AZ deployment:** Uses both subnets
+- **Security group attachment:** Same SG as instances
+- **DNS name generation:** Automatic ALB endpoint creation
+
+### Phase 5: Target Group Configuration
+
+#### Create Target Groups:
+```bash
+# Video Target Group
+aws elbv2 create-target-group \
+    --name "video-targets" \
+    --protocol HTTP \
+    --port 80 \
+    --vpc-id $VPC
+
+# Web Target Group  
+aws elbv2 create-target-group \
+    --name "web-targets" \
+    --protocol HTTP \
+    --port 80 \
+    --vpc-id $VPC
+```
+
+#### Register Targets:
+```bash
+# Register video servers
+aws elbv2 register-targets \
+    --target-group-arn $VIDEOTG \
+    --targets Id=$VIDEOSERVER1 Id=$VIDEOSERVER2
+
+# Register web servers
+aws elbv2 register-targets \
+    --target-group-arn $WEBTG \
+    --targets Id=$WEBSERVER1 Id=$WEBSERVER2
+```
+
+**Exam Focus:** Understanding target registration and health checks
+
+### Phase 6: Listener and Rules Configuration
+
+#### Create Default Listener:
+```bash
+aws elbv2 create-listener \
+    --load-balancer-arn $ALBORN \
+    --protocol HTTP \
+    --port 80 \
+    --default-actions Type=forward,TargetGroupArn=$WEBTG
+```
+
+#### Create Path-Based Routing Rule:
+```bash
+aws elbv2 create-rule \
+    --listener-arn $LISTENERARN \
+    --priority 5 \
+    --conditions file://conditions-pattern.json \
+    --actions Type=forward,TargetGroupArn=$VIDEOTG
+```
+
+#### Conditions Pattern File:
+```json
+[
+  {
+    "Field": "path-pattern",
+    "PathPatternConfig": {
+      "Values": ["vid/*"]
+    }
+  }
+]
+```
+
+**Exam Tip:** Lower priority numbers = higher priority (priority 1 > priority 5)
+
+---
+
+## Testing & Validation
+
+### Expected Behavior:
+
+#### Default Route (Web Target Group):
+- **URL:** `http://[ALB-DNS-NAME]`
+- **Result:** Alternates between Orange (Web Server 1) and Blue (Web Server 2)
+- **Round Robin:** Default load balancing algorithm
+
+#### Path-Based Route (Video Target Group):
+- **URL:** `http://[ALB-DNS-NAME]/vid/`
+- **Result:** Alternates between Red (Video Server 1) and Green (Video Server 2)
+- **Path Pattern:** `/vid/*` matches `/vid/` and `/vid/anything`
+
+### Health Check Validation:
+```bash
+# Check target group health
+aws elbv2 describe-target-health \
+    --target-group-arn $VIDEOTG
+
+aws elbv2 describe-target-health \
+    --target-group-arn $WEBTG
+```
+
+**States:**
+- **healthy:** Target passing health checks
+- **unhealthy:** Target failing health checks  
+- **unused:** Target group not receiving traffic
+- **initial:** Target registration in progress
+
+---
+
+## Cleanup Process (Critical for Cost Management)
+
+### Proper Deletion Order:
+```bash
+# 1. Delete custom rules first
+aws elbv2 delete-rule --rule-arn $VIDEORULE
+
+# 2. Delete listener (removes default rule)
+aws elbv2 delete-listener --listener-arn $LISTENERARN
+
+# 3. Delete target groups
+aws elbv2 delete-target-group --target-group-arn $VIDEOTG
+aws elbv2 delete-target-group --target-group-arn $WEBTG
+
+# 4. Delete load balancer
+aws elbv2 delete-load-balancer --load-balancer-arn $ALBORN
+
+# 5. Terminate EC2 instances
+aws ec2 terminate-instances --instance-ids $VIDEOSERVER1 $VIDEOSERVER2 $WEBSERVER1 $WEBSERVER2
+
+# 6. Delete subnets (wait for instances to terminate)
+aws ec2 delete-subnet --subnet-id $AZ1SUB
+aws ec2 delete-subnet --subnet-id $AZ2SUB
+
+# 7. Delete security group
+aws ec2 delete-security-group --group-id $SGID
+```
+
+**Exam Warning:** Dependency order matters - deleting in wrong order causes errors
+
+---
+
+## Exam-Relevant CLI Knowledge
+
+### High-Probability Command Patterns:
+
+#### ALB Creation Questions:
+- **Subnets requirement:** Must specify multiple AZs
+- **Security groups:** ALB needs appropriate ingress rules
+- **DNS naming:** AWS automatically generates DNS names
+
+#### Target Group Questions:
+- **Health checks:** Default HTTP health checks on port 80
+- **Registration:** Targets must be registered to receive traffic
+- **Multi-group membership:** Instances can belong to multiple target groups
+
+#### Listener Rules Questions:
+- **Priority order:** Lower numbers = higher priority
+- **Default actions:** Every listener needs default action
+- **Conditions:** Path patterns, host headers, HTTP methods
+
+### CLI vs Console Differences:
+
+| Task | CLI Advantage | Console Advantage |
+|------|---------------|------------------|
+| **Automation** | Scriptable, repeatable | Visual workflow |
+| **Speed** | Faster for bulk operations | Easier for beginners |
+| **Exam** | More detailed questions | Basic concept questions |
+| **Real World** | Infrastructure as Code | Quick prototyping |
+
+---
+
+## Common Exam Question Patterns
+
+### 1. Architecture Design (30%)
+**Pattern:** "Design ALB architecture for [scenario]"
+- **Key Elements:** Multi-AZ, target groups, path routing
+- **Answer Focus:** Security groups, subnets, listener rules
+
+### 2. Troubleshooting (25%)
+**Pattern:** "ALB not working, what's wrong?"
+- **Common Issues:** Wrong security groups, single AZ, unhealthy targets
+- **Solution Path:** Check health, verify rules, confirm subnets
+
+### 3. Path-Based Routing (20%)
+**Pattern:** "Route /api to API servers, /web to web servers"
+- **Implementation:** Multiple target groups with listener rules
+- **Priority:** Remember lower numbers = higher priority
+
+### 4. CLI Implementation (15%)
+**Pattern:** "Create ALB using CLI commands"
+- **Key Commands:** create-load-balancer, create-target-group, create-listener
+- **Dependencies:** Subnets → ALB → Target Groups → Listeners → Rules
+
+### 5. Cost Optimization (10%)
+**Pattern:** "How to minimize ALB costs?"
+- **Solutions:** Proper cleanup, right-sizing, resource sharing
+
+---
+
+## Memory Aids for Exam
+
+### ALB Creation Sequence:
+**"SSALT"** - **S**ecurity group, **S**ubnets, **A**LB, **L**istener, **T**argets
+
+### Path Pattern Memory:
+- **Default rule:** Catches everything not matched
+- **Custom rules:** Need specific path patterns
+- **Priority logic:** 1 beats 5 beats 10 beats default
+
+### Health Check States:
+- **healthy** = green light, receives traffic
+- **unhealthy** = red light, no traffic  
+- **unused** = target group exists but no rules point to it
+- **initial** = starting up, be patient
+
+---
+
+## Quick Reference Commands
+
+### Essential ALB CLI Commands:
+```bash
+# Create ALB
+aws elbv2 create-load-balancer
+
+# Create target group  
+aws elbv2 create-target-group
+
+# Register targets
+aws elbv2 register-targets
+
+# Create listener
+aws elbv2 create-listener
+
+# Create rule
+aws elbv2 create-rule
+
+# Check health
+aws elbv2 describe-target-health
+```
+
+### Key Environment Variables:
+```bash
+export VPC="vpc-id"
+export SGID="sg-id"  
+export ALBORN="alb-arn"
+export TARGETGROUPARN="tg-arn"
+export LISTENERARN="listener-arn"
+```
+
+---
+
+## Final Exam Checklist
+
+### Must Remember:
+- [ ] ALB requires minimum 2 AZs with separate subnets
+- [ ] Security groups need HTTP (80) and SSH (22) rules
+- [ ] Default listener rule catches unmatched requests
+- [ ] Lower priority numbers evaluated first
+- [ ] Target health states: healthy, unhealthy, unused, initial
+- [ ] Path patterns use wildcards: `/api/*`, `/vid/*`
+- [ ] Environment variables simplify CLI workflows
+- [ ] Proper cleanup order prevents deletion errors
+
+### CLI Command Priorities:
+- **High:** create-load-balancer, create-target-group, create-listener
+- **Medium:** register-targets, create-rule, describe-target-health
+- **Low:** delete commands, describe commands
+
+**Study Time Recommendation:** 60-90 minutes for hands-on understanding
+
+
