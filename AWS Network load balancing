@@ -1,0 +1,727 @@
+# AWS Network Load Balancer (NLB) Study Notes
+## AWS Solutions Architect Associate Exam Preparation
+
+---
+
+## 🎯 Key Concepts Overview
+
+### What is Network Load Balancer?
+- **OSI Layer**: Operates at Layer 4 (Transport Layer)
+- **Protocols**: TCP, TLS, UDP
+- **Performance**: Built for speed - handles millions of requests per second
+- **Use Case**: Ultra-low latency applications, high-performance scenarios
+
+---
+
+## 📋 Core Features & Characteristics
+
+### Speed & Performance
+- ✅ Millions of requests per second
+- ✅ Ultra-low latency
+- ✅ Built for high-performance applications
+- ✅ Ideal for time-sensitive services
+
+### Protocol Support
+- **TCP**: Transport Control Protocol
+- **TLS**: Transport Layer Security
+- **UDP**: User Datagram Protocol
+
+### Static IP Addresses
+- ✅ Supports Elastic IP addresses
+- ✅ One Elastic IP per subnet via subnet mapping
+- ✅ Important for firewall whitelisting
+- ✅ Only load balancer type that supports static IPs
+
+---
+
+## 🏗️ Architecture & Distribution
+
+### Availability Zone Configuration
+- **Load Balancer Nodes**: One node created per enabled AZ
+- **Default Behavior**: Each node distributes traffic only within its own AZ
+- **Cross-Zone Load Balancing**: When enabled, distributes across all AZs
+
+### Cross-Zone Load Balancing
+| Setting | Traffic Distribution |
+|---------|---------------------|
+| **Disabled** | Each NLB node → Only targets in same AZ |
+| **Enabled** | Each NLB node → All targets across all AZs |
+
+### High Availability Best Practice
+- Enable multiple availability zones
+- Deploy at least one target in each enabled AZ
+- Results in highly resilient and fault-tolerant system
+
+---
+
+## 🔐 TLS & Security Features
+
+### TLS Listener Requirements
+- **Certificate**: Must deploy at least one server certificate on NLB
+- **Function**: Terminates front-end connection and decrypts client requests
+- **Target Routing**: Sends decrypted requests to targets
+
+### TLS Pass-Through Capability
+- ✅ Supports TCP traffic pass-through without decrypting
+- ✅ No certificate termination at load balancer
+- ✅ Maintains end-to-end encryption to destination container
+- ✅ Ideal for applications requiring uninterrupted TLS
+
+---
+
+## 🔄 Traffic Routing Algorithms
+
+### TCP Traffic Routing
+**Flow Hash Algorithm based on:**
+1. Protocol
+2. Source IP address
+3. Source port
+4. Destination IP address
+5. Destination port
+6. TCP sequence number
+
+### UDP Traffic Routing
+**Flow Hash Algorithm based on:**
+1. Protocol
+2. Source IP address
+3. Source port
+4. Destination IP address
+5. Destination port
+
+**Important UDP Behavior:**
+- Same source/destination → Consistently routed to single target
+- Different flows (different source IPs/ports) → Can route to different targets
+
+---
+
+## 🎯 Exam-Critical Differences
+
+### NLB vs ALB Comparison
+| Feature | Network Load Balancer | Application Load Balancer |
+|---------|----------------------|---------------------------|
+| **OSI Layer** | Layer 4 | Layer 7 |
+| **Protocols** | TCP, TLS, UDP | HTTP, HTTPS, WebSocket |
+| **Routing** | IP addresses & ports | Session cookies & content |
+| **Static IPs** | ✅ Elastic IP support | ❌ No static IP |
+| **Performance** | Millions requests/sec | High but lower than NLB |
+| **TLS Pass-through** | ✅ Yes | ❌ No |
+
+---
+
+## 🌐 Common Use Cases & Scenarios
+
+### 1. High-Performance Applications
+- Gaming applications (real-time, UDP traffic)
+- Financial trading systems (ultra-low latency)
+- Video streaming services
+- IoT data ingestion
+
+### 2. Security Requirements
+- Applications requiring end-to-end TLS
+- No certificate termination at load balancer
+- Secure container-to-container communication
+
+### 3. Network Requirements
+- Static IP addresses for firewall whitelisting
+- Cross-VPC communication
+- Cross-account communication
+- On-premises to AWS hybrid architectures
+
+### 4. Protocol-Specific Needs
+- WebSocket applications (long-lived TCP connections)
+- UDP-based applications
+- Non-HTTP/HTTPS protocols
+- Legacy applications using TCP
+
+---
+
+## 🔧 Advanced Configurations
+
+### SaaS Architecture with PrivateLink
+- **VPC Endpoint Services**: Enable private communication
+- **No Internet Traffic**: Customer to provider stays within AWS
+- **Security**: Traffic doesn't traverse public Internet
+- **Use Case**: SaaS providers serving customers privately
+
+### Container Communication
+- **ECS Integration**: Works with EC2 and Fargate launch types
+- **Secure Communication**: Between containers across clusters
+- **Cross-VPC**: Containers can communicate across VPCs
+- **Cross-Account**: Works across different AWS accounts
+
+### Long-Lived Connections
+- ✅ Supports long-lived TCP connections
+- ✅ Ideal for WebSocket applications
+- ✅ Maintains persistent connections
+- ✅ No connection limits like other load balancers
+
+---
+
+## 📝 Exam Tips & Key Points
+
+### When to Choose NLB
+- Question mentions **Layer 4** → Think NLB
+- **UDP traffic** mentioned → Must be NLB
+- **Static IP addresses** needed → Only NLB supports this
+- **Ultra-low latency** required → NLB is optimized for speed
+- **TLS pass-through** needed → NLB capability
+- **Millions of requests per second** → NLB performance
+
+### Red Flag Keywords
+- "OSI Layer 4" = Network Load Balancer
+- "Static IP" = Network Load Balancer
+- "UDP" = Network Load Balancer  
+- "TCP pass-through" = Network Load Balancer
+- "WebSocket" = Network Load Balancer
+- "Firewall whitelisting" = Network Load Balancer (Elastic IP)
+
+### Configuration Remember Points
+- **Cross-zone load balancing**: Disabled by default
+- **Elastic IP**: One per subnet mapping
+- **TLS listener**: Requires server certificate deployment
+- **UDP flows**: Consistently route to same target
+- **Health checks**: Performed at target level
+
+---
+
+## 🚨 Common Exam Scenarios
+
+### Scenario 1: Firewall Whitelisting
+**Question Pattern**: "Application needs static IP for firewall rules"
+**Answer**: Network Load Balancer with Elastic IP addresses
+
+### Scenario 2: Gaming/Real-time Applications
+**Question Pattern**: "UDP traffic, real-time gaming, low latency"
+**Answer**: Network Load Balancer for UDP support and performance
+
+### Scenario 3: End-to-End Encryption
+**Question Pattern**: "TLS traffic without certificate termination"
+**Answer**: Network Load Balancer with TLS pass-through
+
+### Scenario 4: High Performance Trading
+**Question Pattern**: "Millions of requests, ultra-low latency, financial"
+**Answer**: Network Load Balancer for performance requirements
+
+### Scenario 5: WebSocket Applications
+**Question Pattern**: "Long-lived connections, real-time communication"
+**Answer**: Network Load Balancer supports long-lived TCP connections
+
+---
+
+## 📊 Quick Reference Table
+
+| Requirement | Solution |
+|-------------|----------|
+| Static IP addresses | NLB + Elastic IP |
+| UDP traffic | Network Load Balancer |
+| Layer 4 routing | Network Load Balancer |
+| TLS pass-through | Network Load Balancer |
+| Millions of requests/sec | Network Load Balancer |
+| WebSocket support | Network Load Balancer |
+| Cross-zone distribution | Enable cross-zone load balancing |
+| Firewall whitelisting | NLB + Elastic IP per subnet |
+| Container communication | NLB with ECS integration |
+| SaaS private access | NLB + VPC Endpoint Services |
+
+---
+
+## 💡 Memory Aids
+
+**"NSTATIC" - Network Load Balancer Key Features:**
+- **N**etwork (Layer 4)
+- **S**tatic IPs (Elastic IP support)
+- **T**CP/TLS/UDP protocols
+- **A**vailability zone nodes
+- **T**hroughput (millions of requests)
+- **I**P-based routing
+- **C**ross-zone load balancing option
+
+**Remember**: If the question mentions Layer 4, UDP, static IPs, or ultra-high performance → Think Network Load Balancer!
+
+
+# AWS Network Load Balancer (NLB) Study Notes
+## AWS Solutions Architect Associate Exam Preparation
+
+---
+
+## 🎯 Key Concepts Overview
+
+### What is Network Load Balancer?
+- **OSI Layer**: Operates at Layer 4 (Transport Layer)
+- **Protocols**: TCP, TLS, UDP
+- **Performance**: Built for speed - handles millions of requests per second
+- **Use Case**: Ultra-low latency applications, high-performance scenarios
+
+---
+
+## 📋 Core Features & Characteristics
+
+### Speed & Performance
+- ✅ Millions of requests per second
+- ✅ Ultra-low latency
+- ✅ Built for high-performance applications
+- ✅ Ideal for time-sensitive services
+
+### Protocol Support
+- **TCP**: Transport Control Protocol
+- **TLS**: Transport Layer Security
+- **UDP**: User Datagram Protocol
+
+### Static IP Addresses
+- ✅ Supports Elastic IP addresses
+- ✅ One Elastic IP per subnet via subnet mapping
+- ✅ Important for firewall whitelisting
+- ✅ Only load balancer type that supports static IPs
+
+---
+
+## 🏗️ Architecture & Distribution
+
+### Availability Zone Configuration
+- **Load Balancer Nodes**: One node created per enabled AZ
+- **Default Behavior**: Each node distributes traffic only within its own AZ
+- **Cross-Zone Load Balancing**: When enabled, distributes across all AZs
+
+### Cross-Zone Load Balancing
+| Setting | Traffic Distribution |
+|---------|---------------------|
+| **Disabled** | Each NLB node → Only targets in same AZ |
+| **Enabled** | Each NLB node → All targets across all AZs |
+
+### High Availability Best Practice
+- Enable multiple availability zones
+- Deploy at least one target in each enabled AZ
+- Results in highly resilient and fault-tolerant system
+
+---
+
+## 🔐 TLS & Security Features
+
+### TLS Listener Requirements
+- **Certificate**: Must deploy at least one server certificate on NLB
+- **Function**: Terminates front-end connection and decrypts client requests
+- **Target Routing**: Sends decrypted requests to targets
+
+### TLS Pass-Through Capability
+- ✅ Supports TCP traffic pass-through without decrypting
+- ✅ No certificate termination at load balancer
+- ✅ Maintains end-to-end encryption to destination container
+- ✅ Ideal for applications requiring uninterrupted TLS
+
+---
+
+## 🔄 Traffic Routing Algorithms
+
+### TCP Traffic Routing
+**Flow Hash Algorithm based on:**
+1. Protocol
+2. Source IP address
+3. Source port
+4. Destination IP address
+5. Destination port
+6. TCP sequence number
+
+### UDP Traffic Routing
+**Flow Hash Algorithm based on:**
+1. Protocol
+2. Source IP address
+3. Source port
+4. Destination IP address
+5. Destination port
+
+**Important UDP Behavior:**
+- Same source/destination → Consistently routed to single target
+- Different flows (different source IPs/ports) → Can route to different targets
+
+---
+
+## 🎯 Exam-Critical Differences
+
+### NLB vs ALB Comparison
+| Feature | Network Load Balancer | Application Load Balancer |
+|---------|----------------------|---------------------------|
+| **OSI Layer** | Layer 4 | Layer 7 |
+| **Protocols** | TCP, TLS, UDP | HTTP, HTTPS, WebSocket |
+| **Routing** | IP addresses & ports | Session cookies & content |
+| **Static IPs** | ✅ Elastic IP support | ❌ No static IP |
+| **Performance** | Millions requests/sec | High but lower than NLB |
+| **TLS Pass-through** | ✅ Yes | ❌ No |
+
+---
+
+## 🌐 Common Use Cases & Scenarios
+
+### 1. High-Performance Applications
+- Gaming applications (real-time, UDP traffic)
+- Financial trading systems (ultra-low latency)
+- Video streaming services
+- IoT data ingestion
+
+### 2. Security Requirements
+- Applications requiring end-to-end TLS
+- No certificate termination at load balancer
+- Secure container-to-container communication
+
+### 3. Network Requirements
+- Static IP addresses for firewall whitelisting
+- Cross-VPC communication
+- Cross-account communication
+- On-premises to AWS hybrid architectures
+
+### 4. Protocol-Specific Needs
+- WebSocket applications (long-lived TCP connections)
+- UDP-based applications
+- Non-HTTP/HTTPS protocols
+- Legacy applications using TCP
+
+---
+
+## 🔧 Advanced Configurations
+
+### SaaS Architecture with PrivateLink
+- **VPC Endpoint Services**: Enable private communication
+- **No Internet Traffic**: Customer to provider stays within AWS
+- **Security**: Traffic doesn't traverse public Internet
+- **Use Case**: SaaS providers serving customers privately
+
+### Container Communication
+- **ECS Integration**: Works with EC2 and Fargate launch types
+- **Secure Communication**: Between containers across clusters
+- **Cross-VPC**: Containers can communicate across VPCs
+- **Cross-Account**: Works across different AWS accounts
+
+### Long-Lived Connections
+- ✅ Supports long-lived TCP connections
+- ✅ Ideal for WebSocket applications
+- ✅ Maintains persistent connections
+- ✅ No connection limits like other load balancers
+
+---
+
+## 📝 Exam Tips & Key Points
+
+### When to Choose NLB
+- Question mentions **Layer 4** → Think NLB
+- **UDP traffic** mentioned → Must be NLB
+- **Static IP addresses** needed → Only NLB supports this
+- **Ultra-low latency** required → NLB is optimized for speed
+- **TLS pass-through** needed → NLB capability
+- **Millions of requests per second** → NLB performance
+
+### Red Flag Keywords
+- "OSI Layer 4" = Network Load Balancer
+- "Static IP" = Network Load Balancer
+- "UDP" = Network Load Balancer  
+- "TCP pass-through" = Network Load Balancer
+- "WebSocket" = Network Load Balancer
+- "Firewall whitelisting" = Network Load Balancer (Elastic IP)
+
+### Configuration Remember Points
+- **Cross-zone load balancing**: Disabled by default
+- **Elastic IP**: One per subnet mapping
+- **TLS listener**: Requires server certificate deployment
+- **UDP flows**: Consistently route to same target
+- **Health checks**: Performed at target level
+
+---
+
+## 🚨 Common Exam Scenarios
+
+### Scenario 1: Firewall Whitelisting
+**Question Pattern**: "Application needs static IP for firewall rules"
+**Answer**: Network Load Balancer with Elastic IP addresses
+
+### Scenario 2: Gaming/Real-time Applications
+**Question Pattern**: "UDP traffic, real-time gaming, low latency"
+**Answer**: Network Load Balancer for UDP support and performance
+
+### Scenario 3: End-to-End Encryption
+**Question Pattern**: "TLS traffic without certificate termination"
+**Answer**: Network Load Balancer with TLS pass-through
+
+### Scenario 4: High Performance Trading
+**Question Pattern**: "Millions of requests, ultra-low latency, financial"
+**Answer**: Network Load Balancer for performance requirements
+
+### Scenario 5: WebSocket Applications
+**Question Pattern**: "Long-lived connections, real-time communication"
+**Answer**: Network Load Balancer supports long-lived TCP connections
+
+---
+
+## 📊 Quick Reference Table
+
+| Requirement | Solution |
+|-------------|----------|
+| Static IP addresses | NLB + Elastic IP |
+| UDP traffic | Network Load Balancer |
+| Layer 4 routing | Network Load Balancer |
+| TLS pass-through | Network Load Balancer |
+| Millions of requests/sec | Network Load Balancer |
+| WebSocket support | Network Load Balancer |
+| Cross-zone distribution | Enable cross-zone load balancing |
+| Firewall whitelisting | NLB + Elastic IP per subnet |
+| Container communication | NLB with ECS integration |
+| SaaS private access | NLB + VPC Endpoint Services |
+
+---
+
+---
+
+## 🧪 Practical Lab Implementation
+
+### Lab Architecture Overview
+```
+Internet → Network Load Balancer → Target Groups
+                ↓
+    ┌─────────────┬─────────────┐
+    │ TCP Target  │ UDP Target  │
+    │ Group       │ Group       │
+    │ Port 6381   │ Port 6380   │
+    └─────────────┴─────────────┘
+         ↓               ↓
+    TCP Servers    UDP Servers
+    (2 instances)  (2 instances)
+```
+
+### Key Lab Components
+
+#### EC2 Instance Configuration
+- **AMI**: Free tier eligible
+- **Instance Type**: t2.micro
+- **Availability Zones**: Deploy across multiple AZs (us-east-1a, us-east-1b)
+- **Security Group**: Custom rules for ports 22, 6380, 6381
+- **Public IP**: Enabled for direct testing
+
+#### User Data Scripts
+- **TCP Server**: Python script listening on port 6381
+- **UDP Server**: Python script listening on port 6380
+- **Background Process**: Runs continuously via nohup
+- **Response Format**: "Hello from [TCP/UDP] server [number]"
+
+#### Network Load Balancer Setup
+- **Type**: Network Load Balancer
+- **Scheme**: Internet-facing
+- **Subnets**: Multi-AZ deployment (2 subnets minimum)
+- **Listeners**: 
+  - TCP listener on port 6381
+  - UDP listener on port 6380
+
+### Protocol-Based Routing
+
+#### TCP Traffic Testing
+```bash
+# Using netcat (nc) command
+nc <nlb-dns-name> 6381
+# Input: Any text message
+# Output: Response from TCP server
+```
+
+**Key Behavior**: Same session consistently routes to same TCP server instance
+
+#### UDP Traffic Testing
+```python
+# Python UDP sender script
+import socket
+import sys
+
+# Send UDP message to NLB
+socket.sendto("Hello UDP server", (dns_name, 6380))
+```
+
+**Key Behavior**: UDP flows with same source/destination route to same target
+
+---
+
+## 🔧 AWS CLI Implementation Steps
+
+### 1. Environment Setup
+```bash
+# Export VPC ID
+export VPC=$(aws ec2 describe-vpcs --query 'Vpcs[0].VpcId' --output text)
+
+# Get local IP for security group
+export MYIP=$(curl -s https://checkip.amazonaws.com/)
+```
+
+### 2. Security Group Creation
+```bash
+# Create security group
+aws ec2 create-security-group \
+  --group-name my-nlb-security-group \
+  --description "NLB Security Group"
+
+# Add ingress rules
+aws ec2 authorize-security-group-ingress \
+  --group-id $SGID \
+  --protocol tcp \
+  --port 22 \
+  --cidr $MYIP/32
+
+aws ec2 authorize-security-group-ingress \
+  --group-id $SGID \
+  --protocol tcp \
+  --port 6381 \
+  --cidr 0.0.0.0/0
+
+aws ec2 authorize-security-group-ingress \
+  --group-id $SGID \
+  --protocol udp \
+  --port 6380 \
+  --cidr 0.0.0.0/0
+```
+
+### 3. Subnet Creation
+```bash
+# Create subnets in different AZs
+aws ec2 create-subnet \
+  --vpc-id $VPC \
+  --cidr-block 172.31.128.0/24 \
+  --availability-zone us-east-1a
+
+aws ec2 create-subnet \
+  --vpc-id $VPC \
+  --cidr-block 172.31.192.0/24 \
+  --availability-zone us-east-1b
+```
+
+### 4. EC2 Instance Launch
+```bash
+# Launch instances with user data
+aws ec2 run-instances \
+  --image-id ami-xxxxxxxxx \
+  --count 1 \
+  --instance-type t2.micro \
+  --key-name my-key-pair \
+  --security-group-ids $SGID \
+  --subnet-id $SUBNET1 \
+  --user-data file://tcp-server-1.sh \
+  --associate-public-ip-address
+```
+
+### 5. Load Balancer Creation
+```bash
+# Create Network Load Balancer
+aws elbv2 create-load-balancer \
+  --name my-nlb \
+  --type network \
+  --subnets $SUBNET1 $SUBNET2
+```
+
+### 6. Target Group Setup
+```bash
+# Create TCP target group
+aws elbv2 create-target-group \
+  --name tcp-targets \
+  --protocol TCP \
+  --port 6381 \
+  --vpc-id $VPC
+
+# Create UDP target group
+aws elbv2 create-target-group \
+  --name udp-targets \
+  --protocol UDP \
+  --port 6380 \
+  --vpc-id $VPC
+```
+
+### 7. Target Registration
+```bash
+# Register TCP targets
+aws elbv2 register-targets \
+  --target-group-arn $TCP_TG_ARN \
+  --targets Id=$TCP_INSTANCE1 Id=$TCP_INSTANCE2
+
+# Register UDP targets
+aws elbv2 register-targets \
+  --target-group-arn $UDP_TG_ARN \
+  --targets Id=$UDP_INSTANCE1 Id=$UDP_INSTANCE2
+```
+
+### 8. Listener Creation
+```bash
+# Create TCP listener
+aws elbv2 create-listener \
+  --load-balancer-arn $LB_ARN \
+  --protocol TCP \
+  --port 6381 \
+  --default-actions Type=forward,TargetGroupArn=$TCP_TG_ARN
+
+# Create UDP listener
+aws elbv2 create-listener \
+  --load-balancer-arn $LB_ARN \
+  --protocol UDP \
+  --port 6380 \
+  --default-actions Type=forward,TargetGroupArn=$UDP_TG_ARN
+```
+
+---
+
+## 🎯 Protocol-Based Routing Deep Dive
+
+### Flow Hash Algorithm in Action
+
+#### TCP Routing Components
+1. **Protocol**: TCP
+2. **Source IP**: Client IP address
+3. **Source Port**: Client port (ephemeral)
+4. **Destination IP**: NLB IP address
+5. **Destination Port**: 6381 (TCP listener)
+6. **TCP Sequence Number**: Connection-specific
+
+#### UDP Routing Components
+1. **Protocol**: UDP
+2. **Source IP**: Client IP address
+3. **Source Port**: Client port
+4. **Destination IP**: NLB IP address
+5. **Destination Port**: 6380 (UDP listener)
+
+### Session Persistence Behavior
+- **TCP Connections**: Same client maintains connection to same target
+- **UDP Flows**: Same source/destination combination routes to same target
+- **New Sessions**: May route to different targets based on algorithm
+
+---
+
+## 🧹 Resource Cleanup Process
+
+### Deletion Order (Important!)
+1. **Listeners** (delete first)
+2. **Target Groups** (deregister targets first)
+3. **Load Balancer**
+4. **EC2 Instances** (terminate)
+5. **Subnets** (delete custom subnets)
+6. **Security Groups** (delete last)
+
+```bash
+# Example cleanup commands
+aws elbv2 delete-listener --listener-arn $LISTENER_ARN
+aws elbv2 delete-target-group --target-group-arn $TG_ARN
+aws elbv2 delete-load-balancer --load-balancer-arn $LB_ARN
+aws ec2 terminate-instances --instance-ids $INSTANCE_ID
+aws ec2 delete-subnet --subnet-id $SUBNET_ID
+aws ec2 delete-security-group --group-id $SG_ID
+```
+
+---
+
+## 💡 Memory Aids
+
+**"NSTATIC" - Network Load Balancer Key Features:**
+- **N**etwork (Layer 4)
+- **S**tatic IPs (Elastic IP support)
+- **T**CP/TLS/UDP protocols
+- **A**vailability zone nodes
+- **T**hroughput (millions of requests)
+- **I**P-based routing
+- **C**ross-zone load balancing option
+
+**"PURPLE" - Protocol-Based Routing:**
+- **P**rotocol determines target group
+- **U**DP flows stick to same target
+- **R**outing via flow hash algorithm
+- **P**ort numbers critical for routing
+- **L**isteners map protocols to target groups
+- **E**phemeral ports from clients vary
+
+**Remember**: If the question mentions Layer 4, UDP, static IPs, or ultra-high performance → Think Network Load Balancer!
