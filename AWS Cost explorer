@@ -1,0 +1,222 @@
+AWS Certified Solutions Architect Associate
+
+Overview
+
+Tool to view and analyze AWS costs and usage
+Access: Free UI or Cost Explorer API ($0.01 per request)
+Cannot be disabled once enabled
+
+Key Features
+Data Analysis
+
+View last 12 months of historical data
+Forecast next 12 months spending
+Get Reserved Instance (RI) purchase recommendations
+Export data as CSV files
+
+Anomaly Detection
+
+Uses machine learning to identify cost anomalies
+Alerts when cost exceeds $100 OR 40% of expected spend
+Detects misconfiguration, usage spikes, or billing errors
+
+
+Access Management (3 Ways)
+
+Management Account: Root user enables for all member accounts
+Cost Explorer Settings: Control access to costs, refunds, credits, discounts, RI recommendations
+IAM Policies: Grant/deny user access after enabling at management level
+
+
+Cost Types
+Cost TypeDescriptionUnblendedUsage cost on the day chargedBlendedUnblended cost + discountsAmortizedUpfront costs spread across billing period (e.g., All-Upfront RI spread over 12 months)
+
+Cost Drivers & Optimization
+Common Drivers:
+
+Number and type of resources
+Region selection
+Time of day usage
+Data transfer volume
+
+Optimization Strategies:
+
+Scale down unused resources
+Use Reserved/Spot Instances
+Move to lower-cost regions
+Implement Auto Scaling
+
+
+Key Reports
+
+Cost and Usage Report: Custom analysis
+RI Utilization/Coverage: Reserved Instance tracking
+Top Services: Highest spending services
+Monthly Cost by Linked Account: Multi-account view
+Daily Cost: 6-month history + next month forecast
+Monthly Cost by Service: Service-grouped spending
+
+
+Chart Types
+
+Cost Trend: Time-based cost patterns
+Top Cost: Highest spending categories
+By Service/Region/Account: Dimensional breakdowns
+Use filters for specific time periods, regions, or services
+
+
+Integrations
+
+AWS Budgets: Set spending alerts
+Trusted Advisor: Cost optimization recommendations
+Compute Optimizer: Right-sizing guidance
+Cost and Usage Report (CUR): Detailed billing data
+Systems Manager: Operational cost insights
+
+
+Exam Tips
+✅ Remember anomaly detection threshold: $100 or 40%
+✅ Know the difference between unblended, blended, and amortized costs
+✅ Understand amortization for upfront RI purchases
+✅ Cost Explorer cannot be disabled after enabling
+✅ API calls cost $0.01 each
+✅ Forecasting uses historical data (12 months back/forward)RetryClaude can make mistakes. Please double-check responses.
+
+AWS Cost Explorer Demo - Hands-On Notes
+AWS Certified Solutions Architect Associate
+
+Initial Setup
+
+First-time access: Takes 24-48 hours to enable
+Shows current month cost + forecasted cost on homepage
+Note: Spikes/outliers can affect forecast accuracy
+
+
+Cost Explorer Console Components
+1. Chart Types
+
+Line Chart: Trend visualization
+Stack Chart: Layered view with color-coded services
+Hover over bars to see detailed cost breakdown
+
+2. Date Range & Granularity
+
+Custom date range: Select specific time periods
+Granularity options:
+
+Daily: Day-by-day breakdown
+Monthly: Month-by-month view
+Hourly: Only available for paid/non-free-tier accounts
+
+
+
+
+Grouping (Dimensions)
+View costs from different perspectives:
+DimensionShowsServiceCost per AWS service (ELB, WAF, KMS, etc.)RegionCost per AWS regionLinked AccountCost per member accountInstance TypeEC2 instance type breakdownUsage TypeSpecific usage patternsTagsCustom tag-based groupingResourcesIndividual resource costs
+Example: Group by Service → Stack chart shows legend with color codes for each service
+
+Filters
+Narrow down cost data:
+
+Service-specific: Filter by particular services (e.g., only Load Balancer costs)
+Region-specific: Filter by region (e.g., ap-south-1 Mumbai)
+Multiple filters: Combine filters (Service + Region)
+Other filters:
+
+Instance type
+Usage type
+Cost category
+Refunds/Credits
+Taxes (include/exclude)
+
+
+
+Result: Service count and total cost adjust based on applied filters
+
+Cost Types View
+Switch between:
+
+Unblended Cost (default)
+Blended Cost
+Amortized Cost
+Other cost perspectives
+
+
+Reports
+AWS-Managed Reports (Out-of-the-box)
+
+Daily Cost
+Monthly Cost by Service
+Monthly Cost by Linked Account
+RI Utilization/Coverage
+And more...
+
+Custom Reports
+
+Apply desired filters + groups + cost type
+Click "Save Report"
+Name your report (e.g., "My Test Report")
+Access from Reports section (left sidebar)
+Actions: View, Edit, Delete, Duplicate
+
+Recently Accessed Reports
+
+Quick access to frequently used reports
+Shown on homepage
+
+
+Export Data
+
+Download as CSV: Export cost data for external analysis
+Useful for sharing or processing outside AWS
+
+
+Anomaly Detection
+
+Requirement: Minimum $100 spend to enable
+Setup: Subscribe to anomaly detection service
+Alerts: Notifies when cost exceeds $100 OR 40% of expected spend
+Uses machine learning to detect unusual patterns
+
+
+Additional Features
+AWS Budgets (Separate but Related)
+
+Create spending alerts
+Set cost limits
+Budget by:
+
+Service usage
+Region
+Resource type
+Time period
+
+
+
+Trends
+
+Monthly trends: Cost patterns over months
+Service-wise trends: Usage insights per service
+Requires sufficient historical data
+Helpful for identifying cost/usage patterns
+
+
+Exam Tips - Hands-On Scenarios
+✅ Custom reports save time: No need to reapply filters/groups each visit
+✅ Stack charts with grouping: Best for visualizing multi-service costs
+✅ Filters are cumulative: Can combine multiple filters simultaneously
+✅ Free tier limitation: No hourly granularity
+✅ Anomaly detection minimum: $100 spend threshold
+✅ CSV export: Available for all cost data
+✅ Forecasting considers outliers: Spikes affect predictions
+✅ 24-48 hour activation: Plan accordingly for new accounts
+
+Common Use Cases
+
+Identify cost spikes: Group by Service + Daily granularity
+Multi-region analysis: Filter by Region dimension
+Department chargeback: Group by Linked Account or Tags
+Service optimization: Filter specific service + view trends
+Budget planning: Use forecasts + create custom reports
+RetryClaude can make mistakes. Please double-check responses. Sonnet 4.5
