@@ -1,0 +1,9 @@
+NAT Gateway = "One-Way Gate"
+├─ Location: Public Subnet ONLY
+├─ Direction: OUT only (private → internet)
+├─ HA: One per AZ for high availability
+├─ Managed: AWS manages (zero maintenance)
+├─ Cost: $0.045/hour + data charges
+├─ IPv4: YES ✅
+├─ IPv6: NO ❌ (use Egress-only IGW)
+└─ Route: 0.0.0.0/0 → NAT Gateway (in private route table)
