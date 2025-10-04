@@ -65,6 +65,36 @@ Works across regions
 Cost-effective and secure
 No internet gateway required
 
+VPC Peering = AWS managed
+- Highly available ✅
+- No bandwidth bottleneck ✅
+- Automatic redundancy ✅
+
+
+
+        VPC-B
+         / \
+        /   \
+   Peering  Peering
+      /       \
+     /         \
+  VPC-A ----X--- VPC-C
+     (No Direct Connection)
+
+Rule: A cannot talk to C through B!
+VPC-A ←→ VPC-B ←→ VPC-C
+VPC-A se VPC-C ko access karna hai?
+Answer: Direct peering banana padega A-C ke beech!
+
+
+VPC-A: 10.0.0.0/16  ←─X─→  VPC-B: 10.0.0.0/16
+                           (SAME CIDR)
+Peering NAHI ban sakta! ❌
+VPC-A: 10.0.0.0/16  ←─✅─→  VPC-B: 172.16.0.0/16
+                          (Different CIDR)
+Peering ban sakta! ✅
+
+
 VPN Connections
 
 Secure connection to on-premises networks
