@@ -1,0 +1,84 @@
+Key Concepts :
+1. Instance-Level Firewall
+   Security Groups EC2 instance level par kaam karte hain
+   Subnet level nahi, seedha instance par lagta hai
+   Har instance mein ek ya multiple security groups ho sakte hain
+   Ye decide karte hain ki kon sa traffic IN aayega aur kon sa traffic OUT jayega
+
+2. Stateful Nature ⭐ (Exam ke liye MOST IMPORTANT!)
+  Stateful ka matlab simple hai:
+  Agar aapne inbound traffic allow kiya,to uska response automatically allow ho jayega!
+Example:
+  - User ne port 80 par request bheji (HTTP)
+  - Aapne inbound mein port 80 allow kiya
+  - Response automatically wapis jayegi
+  - Aapko outbound rule banane ki zarurat NAHI hai!
+    Kyunki Security Group "yaad rakhta hai" ki ye 
+     connection already establish hua hai.
+
+
+3. First Line of Defense
+ EC2 instances ki sabse pehli security layer
+ Network ACLs ke baad aati hai (jo subnet level par hoti hai)
+ Ye soch lo jaise ghar ka main gate (NACLs) aur phir har kamre ka apna lock (Security Groups)
+
+Important Features - Exam Ke Liye:
+✅ Sirf ALLOW Rules
+  Security Groups mein sirf ALLOW rules hote hain
+  DENY rules NAHI bana sakte
+  By default sab kuch DENY hai
+  Jo explicitly allow karo, sirf wahi traffic aayegi
+
+✅ Default Behavior
+  Inbound Traffic: By default SAB DENY ❌
+  Outbound Traffic: By default SAB ALLOW ✅
+ Matlab instance bahar se kisi ko access nahi kar sakta initially, lekin instance khud bahar access kar sakta hai
+
+✅ Multiple Security Groups
+ Ek instance mein multiple SGs attach kar sakte ho
+ Sabhi rules combine hokar kaam karte hain
+ Agar ek SG mein SSH allow hai aur dusre mein HTTP, to dono allow honge
+
+✅ Changes Immediately Apply
+ Security Group mein changes turant apply hote hain
+ Instance restart karne ki zarurat NAHI
+ Real-time changes!
+
+Security Groups vs Network ACLs (Exam Mein Zaroor Puchte Hain):
+FeatureSecurity GroupsNetwork ACLsKaha lagta haiInstance levelSubnet levelStateful/StatelessStateful ✅Stateless ❌RulesSirf AllowAllow + Deny donoRule ProcessingSab rules check hoteNumber order meinReturn TrafficAuto allowExplicitly allow karna padtaDefaultAll DENY inboundCustom NACL = DENY all
+Common Exam Scenarios:
+
+Scenario 1: Web Server Setup
+Inbound Rules:
+- Port 80 (HTTP) - Allow from 0.0.0.0/0
+- Port 443 (HTTPS) - Allow from 0.0.0.0/0
+- Port 22 (SSH) - Allow from YOUR_IP only
+
+Outbound:
+- Default sab allow hai (stateful hai!)
+Scenario 2: Database Server
+Inbound Rules:
+- Port 3306 (MySQL) - Allow from Web-Server-SG only
+  (Security Group ID use karte hain source mein!)
+  
+Security ke liye:
+- Direct internet access NAHI
+- Sirf web server se connection
+
+Scenario 3: Troubleshooting
+Problem: Website access nahi ho raha
+Check karo:
+1. Security Group mein port 80/443 allow hai?
+2. Inbound rules correct hain?
+3. Source IP sahi hai? (0.0.0.0/0 ya specific IP)
+4. NACL bhi check karo (stateless hai!)
+Important Points - Exam Ke Liye Yaad Rakho:
+
+Stateful = Return traffic automatically allow
+Instance level protection
+Allow rules only - deny nahi kar sakte
+Changes immediate apply hote hain
+Multiple SGs combine ho sakte hain
+Source mein IP ya dusre SG ka reference de sakte ho
+Default inbound DENY, outbound ALLOW
+
