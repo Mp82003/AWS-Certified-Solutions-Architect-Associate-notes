@@ -1,0 +1,169 @@
+Network ACLs (NACLs) - AWS Solutions Architect Exam Guide
+Kya hai Network ACL?
+Network ACL ek subnet-level firewall hai jo virtual firewall ki tarah kaam karta hai. Ye decide karta hai ki kaunsa traffic subnet mein aa sakta hai aur kaunsa bahar ja sakta hai.
+Key Points (Exam ke liye important!)
+1. Subnet-Level Protection
+
+Security Groups = Instance level
+NACLs = Subnet level (poora subnet protect karta hai)
+
+2. Stateless Nature 🔴 (Bahut Important!)
+
+Inbound aur Outbound dono rules separately configure karne padte hain
+Example: Agar port 80 pe inbound allow kiya, toh response ke liye outbound bhi allow karna hoga
+Security Groups stateful hote hain, NACL stateless
+
+3. Default NACL
+
+Har VPC ke saath ek default NACL aata hai
+By default sab kuch allow hota hai (inbound + outbound)
+
+4. Additional Security Layer
+
+Security Groups ke upar extra protection
+Defense in depth strategy ka part
+
+Exam Questions ke liye Scenarios:
+Q1: Security Group vs NACL - Farak kya hai?
+
+Security Group: Stateful, instance-level, only allow rules
+NACL: Stateless, subnet-level, allow + deny rules
+
+Q2: Agar ek subnet se traffic block karni hai toh?
+
+NACL use karo (kyunki NACL mein deny rules hote hain)
+Security Group mein sirf allow rules hote hain
+
+Q3: Default NACL vs Custom NACL?
+
+Default: Sab allow
+Custom: By default sab deny (explicitly allow karna padta hai)
+
+Rule Processing
+
+Rules number order mein process hote hain (lowest first)
+Pehla matching rule apply hota hai, baaki ignore
+Rule numbers: 1-32766 (100, 200, 300... recommend karte hain gaps ke liye)
+
+Exam Tip 💡
+"Stateless" yaad rakho - ye sabse zyada poocha jaata hai exam mein!RetryMquesstion type asked in examEditAWS Solutions Architect Exam - NACL Questions ke Types
+1. Comparison Questions (Sabse Common!)
+Q: Security Group aur NACL mein kya difference hai?
+
+Stateful vs Stateless
+Instance-level vs Subnet-level
+Allow-only vs Allow + Deny rules
+Evaluation order
+
+Q: Kab Security Group use karein aur kab NACL?
+
+Specific instance = Security Group
+Poora subnet block karna = NACL
+Deny rules chahiye = NACL
+
+2. Scenario-Based Questions
+Scenario 1: Traffic Block karna hai
+Q: Ek specific IP address (hackers ka) se aane wali 
+traffic ko block karna hai. Kya use karoge?
+
+Answer: NACL (kyunki deny rules chahiye)
+Scenario 2: Stateless Behavior
+Q: Tumne NACL mein port 443 inbound allow kiya. 
+User ko response kyun nahi mil raha?
+
+Answer: Outbound rule missing hai (NACL stateless hai)
+Scenario 3: Rule Order
+Q: Rule 100: Allow 10.0.0.0/16
+   Rule 200: Deny 10.0.0.5/32
+   Kya 10.0.0.5 se traffic aayegi?
+
+Answer: Haan! (Rule 100 pehle match hoga)
+3. Troubleshooting Questions
+Q: EC2 instance internet access nahi kar pa raha. Security Group sab allow hai. Kya check karoge?
+
+✓ NACL outbound rules
+✓ NACL inbound rules (response ke liye)
+✓ Route table
+✓ Internet Gateway
+
+4. Best Practices Questions
+Q: Multiple subnets ke liye NACL kaise configure karein?
+
+Ek NACL multiple subnets ke saath associate kar sakte ho
+Lekin ek subnet sirf ek NACL ke saath
+
+Q: NACL rule numbering best practice?
+
+100, 200, 300... gaps chhodo
+Future mein beech mein rules add kar sako
+
+5. Default vs Custom NACL
+Q: Naya VPC banaya, default NACL ka behavior kya hoga?
+
+Sab traffic allow (inbound + outbound)
+
+Q: Custom NACL banaya, default behavior?
+
+Sab traffic DENY
+Explicitly allow karna padega
+
+6. Architecture Questions (Diagram-based)
+Q: Is architecture mein security improve kaise karein?
+
+Internet → IGW → Public Subnet (Web Server) 
+                     ↓
+                Private Subnet (Database)
+
+Answer: 
+- Public subnet NACL: HTTP/HTTPS allow, baaki deny
+- Private subnet NACL: Sirf public subnet se traffic allow
+7. Port-Specific Questions
+Q: Web application hai. NACL mein minimum kya allow karna hoga?
+Inbound:
+- Port 80 (HTTP)
+- Port 443 (HTTPS)
+- Port 1024-65535 (ephemeral ports for responses)
+
+Outbound:
+- Port 80, 443
+- Port 1024-65535 (ephemeral ports)
+8. Multiple Choice Tricky Questions
+Q: NACL ke bare mein GALAT statement kaunsi hai?
+
+A) Stateless hai ✗
+B) Subnet level pe kaam karta hai ✗
+C) Automatically return traffic allow karta hai ✓ (YE GALAT HAI!)
+D) Deny rules support karta hai ✗
+
+9. Cost/Performance Questions
+Q: NACL use karne se extra cost lagta hai?
+
+Answer: NAHI! Free hai
+
+Q: 100 rules vs 10 rules - performance difference?
+
+Sequential processing hai, zyada rules = thoda slow
+Best practice: Minimum necessary rules
+
+10. Real-World Problem Questions
+Q: DDoS attack ho raha hai specific IP se. Quick fix?
+Answer: 
+1. NACL mein deny rule add karo (lowest number)
+2. Us IP ko immediately block kar do
+3. Security Group mein nahi kar sakte (no deny rules)
+Exam Tips 🎯
+Yaad Rakhne Wale Points:
+
+S.S.N.A - Security Group = Stateful, NACL = Stateless
+Deny chahiye toh NACL
+Lower number = Higher priority
+Ek subnet = Ek NACL (but ek NACL = multiple subnets OK)
+Ephemeral ports (1024-65535) outbound allow karna mat bhoolna!
+
+Common Mistakes (Exam mein mat karna!):
+
+❌ NACL ko stateful samajhna
+❌ Outbound rules bhool jana
+❌ Rule order ignore karna
+❌ Ephemeral ports miss karna
+❌ Security Group aur NACL confuse karna
