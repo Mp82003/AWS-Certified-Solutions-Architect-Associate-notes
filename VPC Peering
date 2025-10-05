@@ -23,7 +23,7 @@ Destination        Target
 chahiye without using internet. Kya use karein?
 A) VPN Connection
 B) Direct Connect
-C) VPC Peering ✅
+C) VPC Peering 
 D) Internet Gateway
 Answer: C
 Kyun?
@@ -42,7 +42,7 @@ Current Peering:
    - VPC-B ←→ VPC-C (Peering exists)
 VPC-A se VPC-C ko access karna hai. Kya karna hoga?
 A) No action needed, VPC-B will route traffic
-B) Create peering between VPC-A and VPC-C ✅
+B) Create peering between VPC-A and VPC-C 
 C) Add routes in VPC-B for transitive routing
 D) Use NAT Gateway in VPC-B
 Answer: B
@@ -55,7 +55,7 @@ Explanation:
      /         \
   VPC-A ----X--- VPC-C
            NO TRANSITIVE!
-Solution: Direct peering A-C ✅
+Solution: Direct peering A-C 
 Ye exam mein 100% aata hai! Yaad rakho:
 "Transitive peering NOT supported" ⚠️
 
@@ -65,7 +65,7 @@ Ye exam mein 100% aata hai! Yaad rakho:
    - VPC-B: 10.0.5.0/24
 Peering successfully setup hoga?
 A) Yes, VPC peering supports overlapping CIDRs
-B) No, CIDR blocks overlap ✅
+B) No, CIDR blocks overlap 
 C) Yes, but routing will be complex
 D) Yes, if you use NAT Gateway
 Answer: B
@@ -89,7 +89,7 @@ All VPCs ko connect karna hai with private connectivity.
 Most cost-effective solution kya hai?
 A) VPN Connection between all regions
 B) Direct Connect at each location
-C) VPC Peering between all VPCs ✅
+C) VPC Peering between all VPCs 
 D) Transit Gateway with VPN
 Answer: C
 Architecture:
