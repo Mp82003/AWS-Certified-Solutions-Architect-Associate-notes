@@ -1,0 +1,172 @@
+Basic Concept:
+Route Table ek set of rules hai (routes kehte hain) jo decide karta hai:
+   Network traffic kaha route hogi
+   Kaunsa destination kis gateway/interface par jayega
+
+Key Components:
+1. Default Route Table:
+    Har VPC ke saath ek DEFAULT route table automatically aata hai
+Features:
+  - VPC creation ke saath ban jata hai
+  - Local route already hota hai (VPC ke andar traffic ke liye)
+  - Modify kar sakte ho but DELETE nahi kar sakte
+  - Jis subnet ka koi specific route table nahi, wo default use karti hai
+
+2. Custom Route Table
+   Aap apne khud ke route tables bana sakte ho
+Why Custom?
+ - Public aur Private subnets alag manage karne ke liye
+  - Different routing requirements ke liye
+  - Security aur isolation ke liye
+
+3. Subnet Association 
+   IMPORTANT RULE:
+ - Har subnet EKER route table ke saath associated honi chahiye
+ - Ek subnet = Ek route table (at a time)
+  - Ek route table = Multiple subnets (ho sakti hain)
+  Agar explicitly associate nahi kiya = Default route table use hoga
+
+Key Routes - Exam Ke Liye Important:
+ 1. Local Route (VPC Internal Traffic)
+   Destination: 10.0.0.0/16 (ya aapka VPC CIDR)
+   Target: Local
+Matlab:
+- VPC ke andar ka sara traffic automatically route hota hai
+- Ye route DEFAULT aata hai
+- DELETE nahi kar sakte
+- VPC ke sab subnets ek dusre se baat kar sakte hain
+    Agar aapka VPC CIDR: 10.0.0.0/16
+   - Subnet A: 10.0.1.0/24
+   - Subnet B: 10.0.2.0/24
+      Local route ki wajah se dono subnets automatically ek dusre se communicate kar sakti hain
+
+2. Internet Gateway Route (Public Access)
+ Destination: 0.0.0.0/0
+ Target: igw-xxxxx (Internet Gateway)
+Matlab:
+- Default route (sab kuch bahar)
+- Internet access ke liye
+- PUBLIC subnet mein ye route hona chahiye
+Example - Public Subnet Route Table:
+Destination          Target
+10.0.0.0/16    →    Local (VPC internal)
+0.0.0.0/0      →    igw-12345 (Internet)
+
+Public vs Private Subnet - Route Table Difference:
+🌐 PUBLIC Subnet Route Table:
+Destination          Target              Purpose
+10.0.0.0/16    →    Local            VPC internal traffic
+0.0.0.0/0      →    igw-xxxxx        Internet access
+
+Ye subnet INTERNET se accessible hai!
+Example: Web servers, Load balancers
+🔒 PRIVATE Subnet Route Table:
+Destination          Target              Purpose
+10.0.0.0/16    →    Local            VPC internal traffic
+0.0.0.0/0      →    nat-xxxxx        Outbound internet only
+
+Ye subnet internet se DIRECTLY accessible NAHI!
+Example: Database servers, Application servers
+
+Common Routing Scenarios - Exam Questions:
+Scenario 1: Basic Public-Private Setup
+Public Subnet Route Table (Web-RT):
+10.0.0.0/16  →  Local
+0.0.0.0/0    →  igw-123
+
+Private Subnet Route Table (DB-RT):
+10.0.0.0/16  →  Local
+0.0.0.0/0    →  nat-456
+
+Result:
+✅ Web server → Internet se accessible
+✅ Database → Internet se NOT accessible
+✅ Web server ↔ Database communicate kar sakte hain (Local route)
+Scenario 2: VPC Peering
+VPC-A CIDR: 10.0.0.0/16
+VPC-B CIDR: 192.168.0.0/16
+
+VPC-A Route Table:
+10.0.0.0/16      →  Local
+192.168.0.0/16   →  pcx-xxxxx (Peering Connection)
+
+VPC-B Route Table:
+192.168.0.0/16   →  Local
+10.0.0.0/16      →  pcx-xxxxx (Peering Connection)
+
+Result: Dono VPCs communicate kar sakte hain
+Scenario 3: VPN Connection
+On-Premises Network: 172.16.0.0/16
+
+VPC Route Table:
+10.0.0.0/16    →  Local (VPC)
+172.16.0.0/16  →  vgw-xxxxx (Virtual Private Gateway)
+0.0.0.0/0      →  igw-xxxxx (Internet)
+
+Result: VPC ↔ On-Premises secure connection
+Scenario 4: Transit Gateway
+Multiple VPCs ko connect karne ke liye:
+
+Route Table:
+10.0.0.0/16    →  Local
+192.168.0.0/16 →  tgw-xxxxx (Transit Gateway)
+172.31.0.0/16  →  tgw-xxxxx (Transit Gateway)
+
+Result: Hub-and-spoke architecture
+
+Important Targets - Kaha Route Ho Sakta Hai:
+Target TypeSymbolUse CaseLocallocalVPC internal trafficInternet Gatewayigw-xxxxxPublic internet accessNAT Gatewaynat-xxxxxPrivate subnet outboundNAT Instanceeni-xxxxx / instance-idLegacy NAT solutionVPC Peeringpcx-xxxxxVPC to VPCVPN Gatewayvgw-xxxxxOn-premises connectionTransit Gatewaytgw-xxxxxMultiple VPC hubVPC Endpointvpce-xxxxxAWS services privatelyEgress-Only IGWeigw-xxxxxIPv6 outbound only
+
+Route Priority - Exam Important! 🎯
+Jab multiple matching routes hon, to MOST SPECIFIC (longest prefix) win karta hai:
+
+Example Route Table:
+10.0.0.0/16    →  Local
+10.0.1.0/24    →  NAT-Gateway
+0.0.0.0/0      →  Internet-Gateway
+
+Traffic to 10.0.1.50:
+✅ Match: 10.0.1.0/24 (most specific) → NAT Gateway use hoga
+❌ Not used: 10.0.0.0/16 (less specific)
+❌ Not used: 0.0.0.0/0 (least specific)
+
+Priority Order: /32 > /24 > /16 > /8 > /0
+
+Common Exam Questions Pattern:
+Question Type 1: Troubleshooting
+Q: EC2 instance internet access nahi kar pa raha. Kya check karoge?
+
+Answer checklist:
+1. ✅ Route table mein 0.0.0.0/0 → igw-xxx hai?
+2. ✅ Subnet us route table se associated hai?
+3. ✅ Security Group outbound allow hai?
+4. ✅ NACL outbound allow hai?
+5. ✅ Instance mein public IP/Elastic IP hai?
+Question Type 2: Best Practice
+Q: Database servers ke liye konsa routing setup best hai?
+
+Answer:
+- Private subnet mein rakho
+- Route table: 0.0.0.0/0 → NAT Gateway
+- Direct internet access NAHI
+- Outbound updates/patches ke liye NAT use karo
+Question Type 3: Cost Optimization
+Q: Multiple private subnets hai, kaise cost optimize karoge?
+
+Answer:
+- Ek hi NAT Gateway multiple private subnets ke liye
+- Sab private route tables mein same NAT Gateway point karo
+- Multiple NAT Gateways sirf HA ke liye (multi-AZ)
+
+Important Exam Points - Yaad Rakho! 📝
+
+✅ Har subnet ko ek route table chahiye (explicitly ya default)
+✅ Local route automatically hai - delete nahi kar sakte
+✅ 0.0.0.0/0 → IGW = Public subnet
+✅ 0.0.0.0/0 → NAT = Private subnet
+✅ Most specific route wins (longest prefix match)
+✅ Ek route table = multiple subnets possible
+✅ Ek subnet = ek route table (at a time)
+✅ Default route table modify kar sakte ho, delete nahi
+✅ Route propagation VPN/Direct Connect ke liye auto routes
+✅ Edge Association - Internet Gateway level routing
