@@ -93,20 +93,18 @@ VPC-A Route Table:
 VPC-B Route Table:
 192.168.0.0/16   →  Local
 10.0.0.0/16      →  pcx-xxxxx (Peering Connection)
-
 Result: Dono VPCs communicate kar sakte hain
+
 Scenario 3: VPN Connection
 On-Premises Network: 172.16.0.0/16
-
 VPC Route Table:
 10.0.0.0/16    →  Local (VPC)
 172.16.0.0/16  →  vgw-xxxxx (Virtual Private Gateway)
 0.0.0.0/0      →  igw-xxxxx (Internet)
-
 Result: VPC ↔ On-Premises secure connection
+
 Scenario 4: Transit Gateway
 Multiple VPCs ko connect karne ke liye:
-
 Route Table:
 10.0.0.0/16    →  Local
 192.168.0.0/16 →  tgw-xxxxx (Transit Gateway)
@@ -119,7 +117,6 @@ Target TypeSymbolUse CaseLocallocalVPC internal trafficInternet Gatewayigw-xxxxx
 
 Route Priority - Exam Important! 🎯
 Jab multiple matching routes hon, to MOST SPECIFIC (longest prefix) win karta hai:
-
 Example Route Table:
 10.0.0.0/16    →  Local
 10.0.1.0/24    →  NAT-Gateway
@@ -135,24 +132,23 @@ Priority Order: /32 > /24 > /16 > /8 > /0
 Common Exam Questions Pattern:
 Question Type 1: Troubleshooting
 Q: EC2 instance internet access nahi kar pa raha. Kya check karoge?
-
 Answer checklist:
 1. ✅ Route table mein 0.0.0.0/0 → igw-xxx hai?
 2. ✅ Subnet us route table se associated hai?
 3. ✅ Security Group outbound allow hai?
 4. ✅ NACL outbound allow hai?
 5. ✅ Instance mein public IP/Elastic IP hai?
+
 Question Type 2: Best Practice
 Q: Database servers ke liye konsa routing setup best hai?
-
 Answer:
 - Private subnet mein rakho
 - Route table: 0.0.0.0/0 → NAT Gateway
 - Direct internet access NAHI
 - Outbound updates/patches ke liye NAT use karo
+
 Question Type 3: Cost Optimization
 Q: Multiple private subnets hai, kaise cost optimize karoge?
-
 Answer:
 - Ek hi NAT Gateway multiple private subnets ke liye
 - Sab private route tables mein same NAT Gateway point karo
