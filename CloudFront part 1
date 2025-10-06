@@ -1,0 +1,598 @@
+Request Flow - Step by Step
+Pehli Baar Content Request (Cache MISS):
+1. User content request karta hai (browser mein URL dalta hai)
+   ↓
+2. Request nearest edge location pe route hoti hai
+   ↓
+3. Edge location apna cache check karta hai
+   ↓
+4. Content cache mein NAHI mila (Cache MISS)
+   ↓
+5. CloudFront origin server se content fetch karta hai (S3/Custom origin)
+   ↓
+6. Content edge location pe cache ho jaata hai (TTL ke saath store)
+   ↓
+7. Content user ko deliver hota hai
+   ↓
+8. Ab yeh content edge cache mein available hai
+
+
+Dobara Same Content Request (Cache HIT):
+1. Doosra user same content request karta hai
+   ↓
+2. Request nearest edge location pe jaati hai
+   ↓
+3. Edge location cache check karta hai
+   ↓
+4. Content cache mein MIL GAYA! (Cache HIT)
+   ↓
+5. Content instantly edge se hi serve ho gaya (FAST!)
+   ↓
+6. Origin server pe request hi nahi gayi
+
+
+Key Benefits:
+✅ First request: Slow hai (origin se fetch karna pada)
+✅ Subsequent requests: Bahut fast (cache se milta hai)
+✅ Origin load: Kam hota hai (zyada requests edge se serve hoti hain)
+✅ Latency: Minimum hai (nearest edge location se content)
+✅ Global reach: Duniya kahin bhi ho, nearest edge se milega
+
+
+Geographic Distribution Ka Fayda
+Example Scenario:
+Origin Server: Mumbai mein hai
+User 1: Mumbai se access kar raha hai
+   → Mumbai edge location se serve hoga (very fast)
+
+User 2: New York se access kar raha hai
+   → New York edge location se serve hoga (fast)
+   
+User 3: London se access kar raha hai
+   → London edge location se serve hoga (fast)
+
+Result: Har user ko nearest location se content milta hai
+        Origin Mumbai mein hai lekin latency kam hai sabke liye
+
+
+
+TTL (Time To Live) - Deep Dive - EXAM CRITICAL
+TTL Kya Hai - Simple Explanation
+Definition:
+TTL = Timer jo decide karta hai content kitni der cache mein rahega
+Ek expiry time hai cached content ka
+Expire hone ke baad content "stale" (purana) ban jaata hai
+Stale content ko refresh karna padta hai origin se
+
+Analogy:
+TTL = Doodh ki expiry date
+- Doodh fresh hai toh use karo (Cache HIT - serve from edge)
+- Expiry date nikal gayi toh naya doodh lao (Cache MISS - fetch from origin)
+
+
+TTL Kaise Kaam Karta Hai
+Complete TTL Lifecycle:
+Step 1: Initial Caching (T = 0)
+- Content origin se fetch hua
+- Edge location pe cache hua
+- TTL timer start hua: 86,400 seconds (24 hours)
+- Status: Fresh content
+
+Step 2: During TTL Period (T = 0 to 86,400 seconds)
+- User request aati hai
+- CloudFront check karta hai: TTL expired?
+- No! TTL valid hai
+- Content cache se serve ho jaata hai (Cache HIT)
+- Origin pe request nahi jaati
+
+Step 3: After TTL Expires (T > 86,400 seconds)
+- User request aati hai
+- CloudFront check karta hai: TTL expired?
+- Yes! Content stale hai
+- CloudFront origin se fresh content fetch karta hai
+- Naya TTL timer start hota hai
+- Updated content cache mein replace ho jaata hai
+
+
+TTL Configuration Methods - EXAM IMPORTANT
+Teen Tarike Hain TTL Set Karne Ke:
+1. Cache Policies ⭐ (Recommended)
+Location: CloudFront Console → Behaviors → Cache Policy
+Options:
+- Minimum TTL: 1 second
+- Maximum TTL: 31,536,000 seconds (1 year)
+- Default TTL: 86,400 seconds (24 hours)
+
+Example:
+CachingOptimized policy:
+  Min: 1 sec
+  Default: 24 hours  
+  Max: 365 days
+
+2. Cache Behaviors
+Distribution level pe different paths ke liye different TTLs
+Example:
+- /images/* → TTL = 7 days (static images)
+- /api/* → TTL = 0 seconds (dynamic API)
+- /css/* → TTL = 30 days (stylesheets)
+
+3. Custom Headers (Origin Se)
+Origin server response headers mein:
+- Cache-Control: max-age=3600 (1 hour)
+- Expires: Wed, 21 Oct 2025 07:28:00 GMT
+
+CloudFront in headers ko respect karta hai
+Priority: Custom headers > Cache Policy
+
+Content Type Ke Hisaab Se Ideal TTL - EXAM SCENARIOS
+Static Content (Rarely Changes):
+Images, Logos: 30 days to 1 year
+CSS Files: 30-90 days
+JavaScript Libraries: 30-90 days
+Fonts: 1 year
+PDFs, Documents: 30-90 days
+
+Why Long TTL?
+✅ Content change nahi hota
+✅ Cache hits maximize ho jayegi
+✅ Origin load minimum
+✅ Cost savings
+
+Dynamic Content (Frequently Changes):
+News Articles: 5-15 minutes
+Stock Prices: 1-5 minutes  
+Weather Data: 5-10 minutes
+Live Scores: 30 seconds - 1 minute
+User Dashboards: 0 seconds (no cache)
+
+Why Short TTL?
+✅ Users ko latest data chahiye
+✅ Stale content acceptable nahi
+✅ Real-time updates important
+Semi-Static Content:
+Blog Posts: 1-24 hours
+Product Pages: 1-4 hours
+Home Pages: 15 minutes - 1 hour
+API Responses: 5 minutes - 1 hour
+
+Why Medium TTL?
+✅ Balance between freshness and performance
+✅ Updates ho sakte hain but not very frequent
+✅ Good cache hit ratio maintain hoti hai
+
+
+TTL Benefits - EXAM IMPORTANT
+1. Enhanced Performance (Behtar Performance)
+Cache HIT → Origin pe request nahi
+         → Edge se fast delivery
+         → User experience better
+         → Page load time kam
+
+Example:
+Without CloudFront: 2000ms load time
+With CloudFront (cache hit): 50ms load time
+Improvement: 40x faster!
+2. Cost Optimization (Paisa Bachao)
+Cache HIT → Origin pe request nahi
+         → Data transfer cost kam
+         → Origin server load kam
+         → Infrastructure cost kam
+
+Example:
+1 million requests:
+- All from origin: $100
+- 90% cache hit rate: $20
+- Savings: $80 (80% cost reduction!)
+
+3. Reduced Origin Load (Server Load Kam)
+High cache hit ratio → Origin pe kam requests
+                    → Server scaling nahi chahiye
+                    → Downtime risk kam
+                    → Better reliability
+
+Example:
+1000 requests/sec:
+- No cache: Origin handles 1000/sec (might crash!)
+- 95% cache hit: Origin handles 50/sec (easy!)
+
+4. Global Consistency (Sabko Same Content)
+Same TTL → All edge locations update together
+        → Users globally see consistent content
+        → No version mismatch issues
+
+Example:
+Product price update:
+- TTL = 1 hour
+- All edge locations update within 1 hour
+- Global consistency maintained
+
+
+TTL Tradeoffs - EXAM CRITICAL
+Long TTL (Days/Weeks/Months):
+Pros:
+✅ Maximum cache hit ratio
+✅ Minimum origin load
+✅ Lowest cost
+✅ Best performance
+✅ Scales easily
+Cons:
+❌ Content freshness compromised
+❌ Updates slow to propagate
+❌ Stale content served longer
+❌ Need manual invalidation for urgent updates
+
+
+When to Use:
+Static assets (images, CSS, JS)
+Content jo rarely change hota hai
+Cost optimization priority hai
+
+Short TTL (Seconds/Minutes):
+Pros:
+✅ Content always fresh
+✅ Updates quickly visible
+✅ No stale content issues
+✅ Good for dynamic data
+Cons:
+❌ Low cache hit ratio
+❌ High origin load
+❌ More expensive
+❌ Slower performance
+❌ Scaling challenges
+When to Use:
+Dynamic content (news, prices)
+Real-time data
+Content freshness critical hai
+
+TTL Strategy - Best Practices
+Smart TTL Configuration:
+Approach 1: Layered Caching
+Layer 1 - Edge (CloudFront): Short TTL (5 min)
+Layer 2 - Origin Shield: Medium TTL (1 hour)
+Layer 3 - Origin Cache: Long TTL (24 hours)
+
+Benefit: Freshness + Performance balance
+
+Approach 2: Versioned Assets
+Instead of short TTL, use versioning:
+- style.v1.css (TTL = 1 year)
+- style.v2.css (TTL = 1 year)
+- logo.v3.png (TTL = 1 year)
+
+Update: Change filename, not invalidate cache
+Benefit: Maximum caching + instant updates
+
+Approach 3: Conditional Requests
+Use ETags or Last-Modified headers
+Origin responds:
+- 304 Not Modified (no data transfer)
+- 200 OK with new content (when changed)
+
+Benefit: Validation fast hai, full fetch nahi
+
+CloudFront Pricing - EXAM IMPORTANT
+Pricing Model Overview
+Key Points:
+
+No upfront fees - Koi advance payment nahi
+No minimum commitment - Minimum use karna zaruri nahi
+Pay as you go - Jitna use karo utna pay karo
+No charges for setup - Distribution banana free hai
+
+Do Main Components:
+
+Data Transfer (Out to users)
+HTTP/HTTPS Requests
+
+Data Transfer Pricing - EXAM CRITICAL
+
+Data Transfer OUT (Edge se Users ko):
+Region-Based Pricing ⭐
+North America & Europe:
+- First 10 TB/month: $0.085 per GB
+- Next 40 TB/month: $0.080 per GB
+- Next 100 TB/month: $0.060 per GB
+- Over 150 TB/month: $0.040 per GB
+
+Asia Pacific:
+- Generally $0.12 - $0.14 per GB
+- More expensive than NA/EU
+
+South America:
+- Most expensive region
+- Around $0.25 per GB
+
+Middle East & Africa:
+- Around $0.11 - $0.16 per GB
+Example Calculation:
+Scenario: 50 TB data transfer in North America
+
+Breakdown:
+- First 10 TB: 10 TB × $0.085 = $850
+- Next 40 TB: 40 TB × $0.080 = $3,200
+Total: $4,050 per month
+Regional Pricing Ka Impact:
+Same 10 TB transfer:
+- North America: $850
+- Asia Pacific: $1,200-$1,400
+- South America: $2,500
+
+Difference: Region matters a lot!
+Data Transfer IN (AWS Services se CloudFront ko):
+FREE Scenarios ⭐⭐⭐
+✅ S3 → CloudFront: $0 (FREE!)
+✅ EC2 → CloudFront: $0 (FREE!)
+✅ ELB → CloudFront: $0 (FREE!)
+✅ Any AWS Service → CloudFront: $0 (FREE!)
+
+Why Free?
+- AWS encourages using CloudFront
+- Promotes their services
+- Cost effective architecture
+Exam Scenario:
+Q: "Cost to transfer 1 TB from S3 to CloudFront?"
+A: $0 - It's FREE!
+
+Q: "Cost to transfer 1 TB from CloudFront to users in US?"
+A: Approximately $85 (10TB tier pricing)
+
+Request Pricing - EXAM IMPORTANT
+HTTP/HTTPS Requests:
+Pricing Tiers:
+HTTPS Requests (Most Common):
+- First 10 million requests: $0.0075 per 10,000 requests
+- Next 90 million requests: $0.0065 per 10,000 requests
+- Over 100 million requests: $0.0050 per 10,000 requests
+
+HTTP Requests:
+- Slightly cheaper than HTTPS
+- Around $0.0060 per 10,000 requests
+Free Tier ⭐
+Every Month:
+✅ 1 million HTTP/HTTPS requests FREE
+✅ 50 GB data transfer out FREE
+✅ 2 million CloudFront Functions FREE
+
+Great for: Small websites, testing, development
+Example Calculation:
+Scenario: 10 million HTTPS requests per month
+
+Calculation:
+- First 1 million: FREE
+- Next 9 million: (9M / 10,000) × $0.0075
+                = 900 × $0.0075
+                = $6.75 per month
+
+Very economical!
+Other Request Types:
+Special Methods (Slightly More Expensive):
+DELETE, OPTIONS, PATCH, POST, PUT requests:
+- Around $0.012 per 10,000 requests
+- Double the cost of GET/HEAD
+- Still very cheap
+
+Why More Expensive?
+- More processing required
+- Origin connection needed
+- Can't be cached as easily
+Optional Features Pricing - EXAM SCENARIOS
+1. Lambda@Edge ⭐
+What: Serverless code at edge locations
+Pricing:
+- $0.60 per 1 million requests
+- $0.00005001 per GB-second (compute time)
+- $0.00000625125 per 128 MB memory
+
+Example:
+1 million requests, 50ms each, 128MB memory:
+- Requests: $0.60
+- Compute: 50ms × 1M × $0.00000625125 ≈ $0.31
+- Total: ~$0.91
+
+Use Case: Header manipulation, A/B testing, auth
+2. CloudFront Functions (Cheaper Alternative)
+What: Lightweight JavaScript at edge
+Pricing:
+- $0.10 per 1 million invocations
+- Extremely fast (sub-millisecond)
+
+Example:
+10 million invocations: $1.00
+
+Vs Lambda@Edge:
+- 10x cheaper
+- But limited functionality
+
+Use Case: Simple URL rewrites, header changes
+3. Real-Time Logs
+Pricing:
+- $0.01 per 1 million log lines
+
+Example:
+100 million requests with logging:
+- Log cost: $1.00
+
+Benefit: Detailed analytics for optimization
+4. Field-Level Encryption
+Pricing:
+- $0.02 per 10,000 requests
+
+Example:
+1 million requests with FLE:
+- (1M / 10,000) × $0.02 = $2.00
+
+Use Case: Payment data, PII encryption
+5. Key-Value Store (CloudFront KeyValueStore)
+What: Store small data at edge
+Pricing:
+- $1.00 per GB stored per month
+- $0.20 per 1 million reads
+- $1.00 per 1 million writes
+
+Example:
+- 1 GB stored: $1/month
+- 10M reads: $2
+- 1M writes: $1
+
+Use Case: Feature flags, A/B test configs
+Cost Optimization Strategies - EXAM CRITICAL
+Strategy 1: Use Price Classes ⭐⭐⭐
+Price Class 100 (NA + EU only):
+- Cheapest regions only
+- 30-40% cost savings
+- Good for US/EU audience
+
+Price Class 200 (NA + EU + Asia):
+- Medium cost
+- Excludes expensive South America
+
+Price Class All:
+- Best performance
+- Highest cost
+- Global audience
+
+Exam Tip: Match price class to user geography
+Strategy 2: Maximize Cache Hit Ratio
+Higher Cache Hit = Lower Origin Transfer = Cost Savings
+
+Example:
+1 TB origin data, 1000 requests:
+- 50% cache hit: 500 GB origin transfer
+- 90% cache hit: 100 GB origin transfer
+- 95% cache hit: 50 GB origin transfer
+
+Savings: 10x less origin data transfer!
+
+How to Improve:
+✅ Longer TTLs for static content
+✅ Cache more query strings/headers
+✅ Use Origin Shield
+✅ Compress content
+Strategy 3: Compression ⭐
+Enable Gzip/Brotli compression:
+- Text files: 70-90% size reduction
+- HTML/CSS/JS: 60-80% smaller
+
+Example:
+Without compression: 100 GB transfer = $8.50
+With compression (70%): 30 GB transfer = $2.55
+Savings: $5.95 (70% reduction!)
+
+Enable in: Cache policy → Compression support
+Strategy 4: Origin Shield
+What: Extra caching layer before origin
+Benefit: Reduces origin requests
+
+Cost-Benefit:
+- Extra $0.005 per 10,000 requests to shield
+- But saves origin data transfer
+- Worth it if: High traffic + expensive origin
+
+Example:
+1M requests, 80% hit at shield:
+- Shield cost: $500
+- Origin transfer saved: $2,000
+- Net savings: $1,500
+Strategy 5: Free Tier Services
+✅ Use S3 as origin (free transfer to CloudFront)
+✅ Use CloudFront Functions (cheaper than Lambda@Edge)
+✅ Stay within monthly free tier (1M requests + 50GB)
+✅ Regional distribution matches user base (avoid expensive regions)
+Total Cost Example - Real Scenario
+Small Website:
+Traffic:
+- 500,000 requests/month
+- 20 GB data transfer
+- North America only
+- Static content (images, HTML, CSS)
+
+Cost Breakdown:
+- Requests: FREE (under 1M)
+- Data Transfer: FREE (under 50GB)
+- Total: $0/month! 🎉
+
+Perfect for: Blogs, portfolios, small business sites
+Medium Website:
+Traffic:
+- 50 million requests/month
+- 2 TB data transfer (North America)
+- Mix of static + dynamic
+- 85% cache hit ratio
+
+Cost Breakdown:
+- Requests: (50M / 10,000) × $0.0075 ≈ $37.50
+- Data Transfer: 2 TB × $0.085 = $170
+- Total: ~$207.50/month
+
+Affordable for: Growing businesses, SaaS apps
+Large Website:
+Traffic:
+- 1 billion requests/month
+- 100 TB data transfer (Global)
+- Multiple regions
+- Lambda@Edge for personalization
+
+Cost Breakdown:
+- Requests: ~$575
+- Data Transfer: ~$6,000 (varies by region)
+- Lambda@Edge: ~$600
+- Total: ~$7,175/month
+
+For: Enterprise applications, streaming services
+Exam Question Patterns - Pricing
+Common Scenarios:
+Scenario 1:
+Q: "How to reduce CloudFront costs for US-only audience?"
+A: Use Price Class 100 (North America + Europe only)
+   - Excludes expensive regions
+   - 30-40% cost savings
+Scenario 2:
+Q: "Cost to transfer 10 TB from S3 to CloudFront?"
+A: $0 - FREE! Data transfer from AWS services to CloudFront is free
+Scenario 3:
+Q: "High origin costs, how to reduce?"
+A: - Increase TTL (more cache hits)
+   - Enable compression
+   - Use Origin Shield
+   - Optimize cache policies
+Scenario 4:
+Q: "Need custom logic at edge, cost-effective solution?"
+A: Use CloudFront Functions instead of Lambda@Edge
+   - 10x cheaper
+   - Sufficient for simple use cases
+Key Exam Takeaways - TTL & Pricing
+TTL Concepts:
+✅ TTL = Content kitni der cache mein rahega
+✅ Short TTL = Fresh content, high origin load, expensive
+✅ Long TTL = Better performance, stale content risk, cheaper
+✅ Different content types need different TTLs
+✅ Static content = Long TTL, Dynamic = Short TTL
+✅ TTL expired = Content stale = Fetch from origin
+Pricing Concepts:
+✅ Pay-as-you-go model - no upfront costs
+✅ Two main components: Data transfer + Requests
+✅ Regional pricing varies significantly
+✅ AWS to CloudFront = FREE
+✅ CloudFront to users = Charged (region-based)
+✅ Free tier: 1M requests + 50GB/month
+✅ Price classes control which regions = cost optimization
+✅ Cache hit ratio improvement = major cost savings
+✅ Compression = 60-90% data transfer reduction
+Best Practices:
+✅ Match TTL to content update frequency
+✅ Use versioning for static assets (long TTL possible)
+✅ Enable compression for text-based content
+✅ Choose appropriate price class for audience
+✅ Maximize cache hit ratio
+✅ Use Origin Shield for high-traffic origins
+✅ Monitor and optimize regularly
+✅ Use CloudFront Functions over Lambda@Edge when possible
+
+Final Pro Tips:
+
+TTL strategy = Performance vs Freshness tradeoff
+Pricing optimization = Caching + Compression + Right regions
+Always calculate cost before deploying
+Monitor CloudFront metrics for optimization opportunities
+Use AWS Cost Explorer for detailed cost analysis
+RetryClaude does not have the ability to run the code it generates yet.Claude can make mistakes. Please double-check responses.
