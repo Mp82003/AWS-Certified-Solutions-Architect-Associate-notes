@@ -1,0 +1,811 @@
+What is Amazon Rekognition?
+Amazon Rekognition is a service that makes it easy to add image and video analysis to your applications using deep learning technology.
+Core Functionality
+
+Provide an image or video to the Rekognition API
+Service identifies: objects, people, text, scenes, and activities
+Detects inappropriate content
+Performs facial analysis, face comparison, and face search
+
+Technology Foundation
+
+Based on proven, highly scalable deep learning technology
+Same technology used by Amazon's computer vision scientists
+Analyzes billions of images and videos daily
+No machine learning expertise required to use
+Continuously learning from new data
+AWS constantly adds new labels and facial comparison features
+
+Five Major Benefits of Amazon Rekognition
+1. Low Cost
+
+Pay only for images and videos you analyze
+Pay for face metadata you store
+No minimum fees or upfront commitments
+Pay-per-use pricing model
+
+2. Scalable Image Analysis
+
+Analyze millions of images
+Curate and organize massive amounts of visual data
+Scales automatically with demand
+
+3. Integration with Other AWS Services
+
+Amazon S3: Store images and videos
+AWS Lambda: Call Rekognition API directly from Lambda
+Responds to Amazon S3 events automatically
+S3 and Lambda scale automatically
+Build scalable, affordable, and reliable image analysis applications
+
+4. Deep Learning-Based Analysis
+
+Uses deep learning technology for accurate analysis
+Accurately analyzes images
+Finds and compares faces
+Detects objects and scenes in images and videos
+
+5. Easy Integration into Apps
+
+No computer vision or deep learning expertise needed
+Simple API calls
+Quickly build image and video analysis into:
+
+Web applications
+Mobile applications
+Connected device applications
+
+
+
+How Amazon Rekognition Works
+Two API Sets
+1. Amazon Rekognition Image
+
+Analyzes static images
+Example Use Case: Photo management application
+
+Customer uploads photo
+Rekognition detects real-world objects or faces
+Store detected information
+Users can query photos by:
+
+Specific objects
+Specific faces
+Facial expressions (smiling, crying)
+Age of people
+Other attributes
+
+
+
+
+
+2. Amazon Rekognition Video
+
+Analyzes videos (stored and streaming)
+Stored Video: Track path of people
+Streaming Video: Search for persons whose facial descriptions match stored descriptions
+Real-time video analysis capabilities
+
+Key Features of Amazon Rekognition
+1. Labels
+Definition: Object, scene, action, or concept found in an image or video based on its contents
+Capabilities:
+
+Detects objects (skateboard, cars, wheels)
+Detects people
+Detects scenes
+Returns bounding boxes for detected objects
+Provides confidence scores (percentage)
+
+Example Detection:
+Person: 99.3% confidence
+Outdoors: 83.1% confidence
+Rock: 82.8% confidence
+Available in: Both Rekognition Image and Rekognition Video
+
+2. Text Detection
+Capabilities:
+
+Detects text in images and videos
+Converts detected text into machine-readable text
+Recognizes text in various fonts, sizes, and orientations
+
+Use Cases:
+Use CaseDescriptionVisual SearchRetrieve/display images with same text contentInsightsIdentify themes in recognized text from video framesContent SearchSearch for news, sports scores, athlete numbers, captionsNavigationSpeech-enabled apps for visually impaired (restaurant names, shop signs, street signs)FilteringFilter PII (Personally Identifiable Information) from imagesVideo SearchFind clips with specific text keywords (e.g., guest names on graphics)Public SafetyDetect car license plate numbers from traffic cameras
+
+3. Face Detection and Analysis
+Core Capability: Store facial information in server-side containers called Collections
+What is a Collection?
+
+Server-side container for facial information
+Must be created in an AWS region in your account
+Stores facial feature information for all faces
+
+Key Operation: IndexFaces
+
+Detects faces in input image
+Adds faces to specified collection
+Stores facial feature information
+
+Workflow:
+
+Create a face collection
+Use IndexFaces operation to add faces
+Store facial feature information
+Search collection for face matches
+
+Use Cases:
+
+User verification
+Cataloging people
+People counting
+Public safety applications
+Search for known faces in:
+
+Images
+Stored videos
+Streaming videos
+
+
+
+
+4. Streaming Video Events Detection
+Purpose: Detect labels in streaming video in real-time
+How It Works:
+Step 1: Create Stream Processor
+
+Manages analysis of streaming video
+Choose what to detect:
+
+People
+Pets
+Packages
+
+
+
+Step 2: Video Processing
+
+Uses Amazon Kinesis Video Streams to receive and process video
+
+Step 3: Output
+
+Analysis results sent to:
+
+Amazon S3 bucket
+Amazon SNS notifications
+
+
+
+Use Cases:
+
+Real-time security monitoring
+Package detection
+People counting
+Pet detection
+
+
+5. Content Moderation (Detect Inappropriate Content)
+Purpose: Detect inappropriate, unwanted, or offensive content
+Top-Level Categories Detected:
+
+Explicit Nudity
+Suggestive content
+Violence
+Visually Disturbing content
+Rude Gestures
+Drugs
+Alcohol
+Hate Symbols
+And more...
+
+API Operation: DetectModerationLabels
+Use Cases:
+
+Social media: Create safer user experience
+Broadcast media: Content compliance
+Advertising: Brand safety assurances
+E-commerce: Comply with local and global regulations
+
+Traditional Challenge:
+
+Human moderators alone cannot scale
+Manual review is slow and expensive
+Leads to poor user experience or brand reputation loss
+
+Solution with Rekognition:
+
+Machine learning flags content automatically
+Human moderators review only 1-5% of total volume
+Already flagged by ML
+Comprehensive coverage at fraction of cost
+Moderators focus on more valuable activities
+
+
+AWS Service Integrations
+Amazon S3 Integration
+
+Store images and videos
+Trigger Rekognition analysis on upload
+Store analysis results
+
+AWS Lambda Integration
+
+Call Rekognition API directly from Lambda
+Respond to S3 events automatically
+Build serverless image analysis pipelines
+
+Amazon Kinesis Video Streams
+
+Process streaming video
+Real-time video analysis
+
+Amazon SNS
+
+Receive notifications about analysis results
+Alert on detected events
+
+Common Use Cases by Feature
+Face Recognition Use Cases:
+✅ User verification and authentication
+✅ Employee access control
+✅ People counting
+✅ Security and surveillance
+✅ Photo organization and search
+✅ Celebrity recognition
+Text Detection Use Cases:
+✅ License plate recognition
+✅ Document scanning
+✅ Visual search
+✅ Accessibility apps for visually impaired
+✅ PII filtering
+✅ Video content indexing
+Content Moderation Use Cases:
+✅ Social media platforms
+✅ User-generated content filtering
+✅ Brand safety
+✅ Compliance with regulations
+✅ E-commerce product images
+Object and Scene Detection Use Cases:
+✅ Photo organization
+✅ Visual search engines
+✅ Retail inventory management
+✅ Manufacturing quality control
+✅ Security monitoring
+Important Exam Topics
+Must Know for Exam:
+
+What is Amazon Rekognition - Image and video analysis service
+Two API Sets:
+
+Rekognition Image (static images)
+Rekognition Video (stored and streaming videos)
+
+
+Main Features:
+
+Face detection and analysis
+Text detection
+Content moderation
+Labels (objects, scenes, activities)
+Streaming video events
+
+
+
+Key Concepts:
+
+Collections: Server-side containers for facial information
+IndexFaces: Operation to add faces to collections
+Bounding Boxes: Location of detected objects
+Confidence Scores: Accuracy percentage
+Machine-readable text: Converted from detected text
+
+Exam Tips
+Remember These Key Points:
+
+No ML Expertise Required - Simple API calls
+Deep Learning Technology - Same as Amazon uses internally
+Scalable - Analyze millions of images/videos
+Pay-per-Use - No upfront costs or minimums
+Two APIs - Image (static) and Video (stored/streaming)
+Collections - Store facial information
+Content Moderation - Reduce human review to 1-5% of volume
+Text Detection - License plates, signs, documents
+S3 + Lambda Integration - Serverless architecture
+Kinesis Video Streams - For streaming video processing
+
+Common Exam Scenarios:
+Scenario 1: Photo organization app with face search
+→ Use Rekognition Image + Collections
+Scenario 2: Detect license plates from traffic cameras
+→ Use Rekognition Text Detection
+Scenario 3: Filter inappropriate user-uploaded images
+→ Use Rekognition Content Moderation
+Scenario 4: Real-time security monitoring with face matching
+→ Use Rekognition Video + Kinesis Video Streams
+Scenario 5: Automatically tag photos with objects/scenes
+→ Use Rekognition Image Labels
+Scenario 6: Reduce cost of manual content review
+→ Use Content Moderation to flag 95-99% automatically
+
+Quick Comparison with Other Services
+ServicePurposeRekognitionImage/video analysis, face detection, object detectionComprehendText analysis, NLP, sentimentTranslateLanguage translationTranscribeSpeech-to-textPollyText-to-speechTextractExtract text and data from documents
+Key Distinction: Rekognition focuses on visual content analysis (images/videos), while Comprehend focuses on text analysis.RetryClaude does not have the ability to run the code it generates yet.
+
+
+
+
+AWS Certified Solutions Architect Associate - Amazon Rekognition Previous Year Questions
+Question 1: Service Identification
+A social media company needs to automatically detect and filter inappropriate images uploaded by users. Which AWS service should they use?
+
+A) Amazon Comprehend
+B) Amazon Rekognition
+C) Amazon Textract
+D) Amazon Macie
+
+Answer: B) Amazon Rekognition
+
+Explanation: Amazon Rekognition's Content Moderation feature can detect inappropriate, unwanted, or offensive content in images and videos. Comprehend analyzes text, Textract extracts text from documents, and Macie is for data security.
+
+Question 2: API Sets
+How many API sets does Amazon Rekognition provide?
+
+A) One (Rekognition API)
+B) Two (Rekognition Image and Rekognition Video)
+C) Three (Image, Video, and Text)
+D) Four (Image, Video, Face, and Object)
+
+Answer: B) Two (Rekognition Image and Rekognition Video)
+
+Explanation:
+
+Rekognition Image: Analyzes static images
+Rekognition Video: Analyzes stored and streaming videos
+Question 3: Face Collections
+A company wants to build a facial recognition system to verify employee access. They need to store facial information for comparison. What should they use?
+
+A) Amazon S3 buckets
+B) Amazon Rekognition Collections
+C) Amazon DynamoDB tables
+D) Amazon RDS database
+
+Answer: B) Amazon Rekognition Collections
+
+Explanation: Collections are server-side containers in Rekognition that store facial information. You use the IndexFaces operation to add faces to collections, then search for matches.
+
+Question 4: Text Detection Use Case
+A transportation authority needs to automatically read and log vehicle license plate numbers from traffic camera images. Which Amazon Rekognition feature should they use?
+
+A) Face Detection
+B) Object Detection
+C) Text Detection
+D) Content Moderation
+
+Answer: C) Text Detection
+
+Explanation: Amazon Rekognition's Text Detection feature can detect and read text in images, including license plate numbers. It converts detected text into machine-readable format.
+
+Question 5: Content Moderation Efficiency
+A video sharing platform currently has human moderators reviewing 100% of uploaded content. After implementing Amazon Rekognition Content Moderation, what percentage of content typically still requires human review?
+
+A) 50-60%
+B) 20-30%
+C) 10-15%
+D) 1-5%
+
+Answer: D) 1-5%
+
+Explanation: With Rekognition Content Moderation, machine learning automatically flags inappropriate content, reducing human review to typically 1-5% of total volume. This provides comprehensive coverage at a fraction of the cost.
+
+Question 6: Pricing Model
+What is the pricing model for Amazon Rekognition?
+
+A) Fixed monthly subscription
+B) Pay for images/videos analyzed and face metadata stored
+C) Free tier with unlimited usage
+D) Per-hour compute pricing
+
+Answer: B) Pay for images/videos analyzed and face metadata stored
+
+Explanation: Amazon Rekognition has no minimum fees or upfront commitments. You pay only for:
+
+Images and videos you analyze
+Face metadata you store in collections
+Question 7: Label Detection
+Amazon Rekognition detected a person in an image with 99.3% confidence. What does this confidence score represent?
+
+A) The image quality
+B) The accuracy/confidence of the detection
+C) The number of people detected
+D) The size of the bounding box
+
+Answer: B) The accuracy/confidence of the detection
+
+Explanation: Confidence scores (as percentages) indicate how confident Rekognition is in the accuracy of each detected label. Higher percentages mean higher confidence in the detection.
+
+Question 8: Bounding Boxes
+What does Amazon Rekognition provide along with object detection?
+
+A) Object color only
+B) Object name only
+C) Bounding boxes showing object location
+D) Object price
+
+Answer: C) Bounding boxes showing object location
+
+Explanation: Amazon Rekognition returns bounding boxes that show the location of detected objects (people, cars, etc.) within the image.
+
+Question 9: Integration Architecture
+A company wants to automatically analyze images as soon as they are uploaded to S3 and store the results. Which architecture is most appropriate?
+
+A) S3 → Manual processing → DynamoDB
+B) S3 → S3 Event → Lambda → Rekognition → S3/DynamoDB
+C) S3 → EC2 → Rekognition → RDS
+D) S3 → CloudWatch → Rekognition → S3
+
+Answer: B) S3 → S3 Event → Lambda → Rekognition → S3/DynamoDB
+
+Explanation:
+
+Upload image to S3
+S3 event triggers Lambda function
+Lambda calls Rekognition API
+Store results in S3 or DynamoDB This is a serverless, scalable architecture.
+Question 10: Streaming Video Processing
+Which AWS service does Amazon Rekognition Video use to receive and process streaming video?
+
+A) Amazon S3
+B) Amazon Kinesis Video Streams
+C) Amazon CloudFront
+D) Amazon ElastiCache
+
+Answer: B) Amazon Kinesis Video Streams
+
+Explanation: Amazon Rekognition Video uses Amazon Kinesis Video Streams to receive and process video streams for real-time analysis.
+
+Question 11: Stream Processor Detection Options
+When creating a stream processor in Amazon Rekognition, what can you choose to detect? (Choose THREE)
+
+A) People
+B) Weather
+C) Pets
+D) Packages
+E) Temperature
+F) Audio
+
+Answer: A, C, D (People, Pets, Packages)
+
+Explanation: Stream processors can detect:
+
+People
+Pets
+Packages
+Not weather, temperature, or audio (Rekognition is for visual analysis).
+
+Question 12: Content Moderation Categories
+Which of the following are top-level categories detected by Amazon Rekognition Content Moderation? (Choose FOUR)
+
+A) Explicit Nudity
+B) Financial Data
+C) Violence
+D) Rude Gestures
+E) Programming Code
+F) Drugs
+
+Answer: A, C, D, F
+
+Explanation: Content Moderation categories include:
+
+Explicit Nudity
+Suggestive content
+Violence
+Visually Disturbing content
+Rude Gestures
+Drugs
+Alcohol
+Hate Symbols
+Not financial data or programming code.
+
+Question 13: IndexFaces Operation
+What does the IndexFaces operation do in Amazon Rekognition?
+
+A) Searches for faces in a collection
+B) Deletes faces from a collection
+C) Detects faces and adds them to a specified collection
+D) Compares two faces
+
+Answer: C) Detects faces and adds them to a specified collection
+
+Explanation: IndexFaces detects faces in an input image and adds them to a specified collection, storing facial feature information for later searching.
+
+Question 14: Machine Learning Expertise
+What level of machine learning expertise is required to use Amazon Rekognition?
+
+A) Expert level required
+B) Intermediate level required
+C) Basic understanding required
+D) No ML expertise required
+
+Answer: D) No ML expertise required
+
+Explanation: Amazon Rekognition requires no machine learning, computer vision, or deep learning expertise. It provides simple API calls for image and video analysis.
+
+Question 15: Photo Management Application
+A photo management app allows users to search their photos. Users want to find "photos with smiling people" or "photos of people aged 20-30". Which Rekognition feature enables this?
+
+A) Label Detection
+B) Text Detection
+C) Face Detection and Analysis
+D) Content Moderation
+
+Answer: C) Face Detection and Analysis
+
+Explanation: Face Detection and Analysis can detect facial attributes including:
+
+Emotions (smiling, crying)
+Age range
+Gender
+Other facial features
+This enables deep querying of photo collections.
+
+Question 16: Text Detection Use Cases
+Which of the following are valid use cases for Amazon Rekognition Text Detection? (Choose THREE)
+
+A) Navigation apps for visually impaired (reading street signs)
+B) Analyzing customer sentiment
+C) Filtering PII from images
+D) Translating languages
+E) Detecting license plates
+
+Answer: A, C, E
+
+Explanation: Text Detection use cases include:
+
+Navigation (reading signs for visually impaired)
+Filtering PII from images
+License plate detection
+Document scanning
+Visual search
+Sentiment analysis is Comprehend, translation is Translate.
+
+Question 17: Deep Learning Technology
+What technology foundation does Amazon Rekognition use?
+
+A) Rule-based algorithms
+B) Statistical models
+C) Deep learning technology
+D) Manual image tagging
+
+Answer: C) Deep learning technology
+
+Explanation: Amazon Rekognition uses proven, highly scalable deep learning technology - the same technology Amazon uses to analyze billions of images and videos daily.
+
+Question 18: Celebrity Recognition
+A media company wants to automatically tag photos containing celebrities. Which Amazon Rekognition feature should they use?
+
+A) Generic Face Detection
+B) Celebrity Recognition (part of Face Detection)
+C) Label Detection
+D) Text Detection
+
+Answer: B) Celebrity Recognition (part of Face Detection)
+
+Explanation: Amazon Rekognition includes Celebrity Recognition as part of its face detection capabilities, allowing automatic identification and tagging of celebrities.
+
+Question 19: Video Path Tracking
+A retail store wants to track the path customers take through the store using security camera footage. Which Rekognition capability should they use?
+
+A) Rekognition Image
+B) Rekognition Video for stored video
+C) Text Detection
+D) Content Moderation
+
+Answer: B) Rekognition Video for stored video
+
+Explanation: Amazon Rekognition Video can track the path of people in stored video, making it ideal for analyzing customer movement patterns in retail environments.
+
+Question 20: Output Destinations
+Where are the results of streaming video analysis sent? (Choose TWO)
+
+A) Amazon S3 bucket
+B) Amazon RDS
+C) Amazon SNS notifications
+D) Amazon CloudWatch Logs only
+E) Local storage
+
+Answer: A, C
+
+Explanation: Streaming video analysis results are output to:
+
+Amazon S3 bucket (for storage and further analysis)
+Amazon SNS notifications (for real-time alerts)
+Scenario-Based Question 21: E-commerce Platform
+An e-commerce platform has the following requirements:
+
+Users upload product images
+Automatically detect and remove inappropriate images
+Extract product text (brand names, descriptions) from images
+Organize products by detected objects (shoes, shirts, etc.)
+All processing must be serverless and scalable
+Which AWS architecture should they implement?
+
+A) EC2 → Manual Processing → RDS
+B) S3 → Lambda → Rekognition (Content Moderation + Text Detection + Labels) → DynamoDB
+C) S3 → EMR → Rekognition → Redshift
+D) ECS → Rekognition → Aurora
+
+Answer: B) S3 → Lambda → Rekognition (Content Moderation + Text Detection + Labels) → DynamoDB
+
+Explanation:
+
+Upload images to S3
+S3 event triggers Lambda
+Lambda calls Rekognition:
+Content Moderation: Filter inappropriate images
+Text Detection: Extract brand names/descriptions
+Label Detection: Detect product categories
+Store results in DynamoDB
+Fully serverless and auto-scaling
+Question 22: Face Comparison
+A security system needs to compare a person's face at the entrance with their employee ID photo. Which Rekognition capability should be used?
+
+A) Face Search
+B) Face Comparison
+C) Face Detection only
+D) Celebrity Recognition
+
+Answer: B) Face Comparison
+
+Explanation: Face Comparison compares two faces to determine if they match, which is perfect for verifying identity against an existing photo.
+
+Question 23: Machine-Readable Text
+What does Amazon Rekognition do with text detected in images?
+
+A) Only highlights text location
+B) Converts detected text into machine-readable text
+C) Translates text to other languages
+D) Analyzes sentiment of the text
+
+Answer: B) Converts detected text into machine-readable text
+
+Explanation: Rekognition detects text in images/videos and converts it to machine-readable text that can be searched, indexed, or processed by other applications.
+
+Question 24: Real-time Security Monitoring
+A building security system needs to monitor live camera feeds and alert security when unknown faces are detected. Which services should be combined?
+
+A) S3 + Rekognition Image
+B) Kinesis Video Streams + Rekognition Video + SNS
+C) CloudWatch + Rekognition Image
+D) Lambda + Rekognition Image only
+
+Answer: B) Kinesis Video Streams + Rekognition Video + SNS
+
+Explanation:
+
+Kinesis Video Streams: Ingest live video feeds
+Rekognition Video: Analyze streaming video, search for faces in collections
+SNS: Send real-time alerts when unknown faces detected
+Question 25: Use Case Categories
+Which use cases are appropriate for Amazon Rekognition? (Choose FOUR)
+
+A) User verification and authentication
+B) Database query optimization
+C) Content moderation for social media
+D) License plate detection
+E) Network traffic analysis
+F) Photo organization and search
+
+Answer: A, C, D, F
+
+Explanation: Valid Rekognition use cases:
+
+User verification (face recognition)
+Content moderation (inappropriate content detection)
+License plate detection (text detection)
+Photo organization (labels, faces)
+Not database optimization or network traffic analysis.
+
+Question 26: Scalability
+A photo-sharing app has 10 million users uploading photos. How does Amazon Rekognition handle this scale?
+
+A) Requires manual scaling configuration
+B) Limited to 1 million images per day
+C) Automatically scales to analyze millions of images
+D) Requires dedicated EC2 instances
+
+Answer: C) Automatically scales to analyze millions of images
+
+Explanation: Amazon Rekognition automatically scales to handle millions of images, requiring no manual scaling configuration or dedicated infrastructure.
+
+Question 27: Integration with Lambda
+What makes the integration between Lambda and Rekognition powerful for image analysis?
+
+A) Lambda provides GPU acceleration
+B) Lambda can call Rekognition API in response to S3 events; both scale automatically
+C) Lambda stores images faster
+D) Lambda reduces Rekognition costs
+
+Answer: B) Lambda can call Rekognition API in response to S3 events; both scale automatically
+
+Explanation: Lambda can call Rekognition API directly in response to S3 events, and since both Lambda and S3 scale automatically, you can build fully serverless, scalable image analysis applications.
+
+Question 28: Continuous Improvement
+What makes Amazon Rekognition continuously improve over time?
+
+A) Manual updates by developers
+B) Always learning from new data; AWS adds new labels and features
+C) User feedback only
+D) Static model with no updates
+
+Answer: B) Always learning from new data; AWS adds new labels and features
+
+Explanation: Amazon Rekognition is continuously learning from new data, and AWS continuously adds new labels and facial comparison features to the service.
+
+Question 29: Brand Safety
+An advertising platform needs to ensure ads don't appear next to inappropriate content. Which Rekognition feature helps achieve this?
+
+A) Label Detection
+B) Face Detection
+C) Content Moderation
+D) Text Detection
+
+Answer: C) Content Moderation
+
+Explanation: Content Moderation detects inappropriate, unwanted, or offensive content, helping provide brand safety assurances to advertisers and comply with regulations.
+
+Question 30: Cost Optimization
+A startup wants to implement facial recognition but has limited budget. What makes Amazon Rekognition cost-effective?
+
+A) Requires expensive GPU servers
+B) Pay-per-use with no minimum fees or upfront commitments
+C) Requires annual contract
+D) Fixed monthly cost regardless of usage
+
+Answer: B) Pay-per-use with no minimum fees or upfront commitments
+
+Explanation: Rekognition's pay-per-use model with no minimum fees or upfront commitments makes it cost-effective for startups and businesses of all sizes. You only pay for what you analyze.
+
+Quick Reference for Exam
+Amazon Rekognition Core Capabilities:
+✅ Image Analysis - Objects, scenes, faces, text
+✅ Video Analysis - Stored and streaming video
+✅ Face Detection - Collections, comparison, search
+✅ Text Detection - License plates, signs, documents
+✅ Content Moderation - Inappropriate content filtering
+✅ Labels - Objects, scenes, activities with confidence scores
+✅ Celebrity Recognition - Automatic celebrity identification
+
+Two APIs:
+✅ Rekognition Image - Static images
+✅ Rekognition Video - Stored and streaming videos
+
+Key Integrations:
+✅ Amazon S3 - Image/video storage
+✅ AWS Lambda - Serverless processing
+✅ Kinesis Video Streams - Streaming video
+✅ Amazon SNS - Notifications
+
+Key Operations:
+✅ IndexFaces - Add faces to collections
+✅ DetectModerationLabels - Content moderation
+✅ DetectText - Text detection
+✅ DetectLabels - Object/scene detection
+
+Important Facts:
+✅ No ML expertise required
+✅ Deep learning based
+✅ Auto-scaling
+✅ Pay-per-use pricing
+✅ Collections store facial information
+✅ Bounding boxes show object locations
+✅ Confidence scores indicate accuracy
+✅ Content moderation reduces human review to 1-5%
+
+Common Exam Patterns:
+Content moderation for social media
+Face collections for authentication
+Text detection for license plates
+S3 + Lambda + Rekognition serverless architecture
+Kinesis Video Streams for real-time analysis
+Cost optimization with pay-per-use model
+
