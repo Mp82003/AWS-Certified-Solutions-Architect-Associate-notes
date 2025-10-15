@@ -205,3 +205,109 @@ Multi-region analysis: Filter by Region dimension
 Department chargeback: Group by Linked Account or Tags
 Service optimization: Filter specific service + view trends
 Budget planning: Use forecasts + create custom reports
+
+
+Question 1: Anomaly Detection Threshold
+A company wants to implement cost anomaly detection for their AWS account. What are the conditions that trigger a cost anomaly alert in AWS Cost Explorer?
+A) When costs exceed $50 or 30% of expected spend
+B) When costs exceed $100 or 40% of expected spend ✅
+C) When costs exceed $200 or 50% of expected spend
+D) When costs exceed $500 or 60% of expected spend
+Answer: B - Cost Explorer uses machine learning and alerts when costs exceed $100 OR 40% of expected spend.
+
+Question 2: Cost Types for Reserved Instances
+A Solutions Architect needs to view the cost of All-Upfront Reserved Instances spread evenly across the entire billing period. Which cost type should they select in Cost Explorer?
+A) Unblended Cost
+B) Blended Cost
+C) Amortized Cost ✅
+D) Net Unblended Cost
+Answer: C - Amortized costs spread upfront RI payments across the billing period (e.g., All-Upfront RI spread over 12 months).
+
+Question 3: Initial Setup Time
+A company just enabled AWS Cost Explorer for the first time. When will they be able to view their cost data?
+A) Immediately after enabling
+B) Within 1 hour
+C) Within 24-48 hours ✅
+D) After 7 days of data collection
+Answer: C - Cost Explorer takes 24-48 hours to enable for first-time users.
+
+Question 4: Access Management
+A company with an AWS Organization wants to enable Cost Explorer for all member accounts. What is the correct approach?
+A) Each member account must enable Cost Explorer individually
+B) The root user of the management account enables it for all member accounts ✅
+C) Create an IAM policy in each member account
+D) Use AWS Systems Manager to enable it organization-wide
+Answer: B - The management account's root user must enable Cost Explorer for all member accounts.
+
+Question 5: Data Retention and Forecasting
+What is the maximum historical data period and forecasting period available in AWS Cost Explorer?
+A) 6 months historical, 6 months forecast
+B) 12 months historical, 12 months forecast ✅
+C) 24 months historical, 12 months forecast
+D) 12 months historical, 24 months forecast
+Answer: B - Cost Explorer shows last 12 months of historical data and forecasts the next 12 months.
+
+Question 6: API Pricing
+A company wants to programmatically access Cost Explorer data. What is the cost per API request?
+A) Free
+B) $0.01 per request ✅
+C) $0.10 per request
+D) $1.00 per request
+Answer: B - Cost Explorer API calls cost $0.01 each. The UI is free.
+
+Question 7: Disabling Cost Explorer
+A company enabled AWS Cost Explorer but now wants to disable it to reduce costs. What should they do?
+A) Contact AWS Support to disable it
+B) Use the AWS CLI to disable the service
+C) Disable it through the Billing Console
+D) Cost Explorer cannot be disabled once enabled ✅
+Answer: D - Cost Explorer cannot be disabled after enabling.
+
+Question 8: Cost Optimization Scenario
+A Solutions Architect needs to identify which AWS service is causing unexpected cost increases over the past 30 days. What is the BEST approach using Cost Explorer?
+A) View Monthly Cost by Linked Account report
+B) Use Daily granularity, Group by Service, and filter for the last 30 days ✅
+C) Export all data to CSV and analyze externally
+D) Check the RI Utilization report
+Answer: B - Use Daily granularity with Group by Service to identify cost spikes by service over a specific period.
+
+Question 9: Multi-Account Chargeback
+A company with multiple AWS accounts needs to generate chargeback reports for different departments. Which Cost Explorer dimension should they use?
+A) Group by Service
+B) Group by Region
+C) Group by Linked Account ✅
+D) Group by Instance Type
+Answer: C - Group by Linked Account shows costs per member account, ideal for department chargeback.
+
+Question 10: Hourly Granularity
+When is hourly granularity available in AWS Cost Explorer?
+A) Always available for all accounts
+B) Only for accounts with minimum $1000 monthly spend
+C) Only for paid/non-free-tier accounts ✅
+D) Only for Enterprise Support customers
+Answer: C - Hourly granularity is only available for paid/non-free-tier accounts.
+
+Common Exam Patterns
+Scenario-Based Questions Look For:
+
+Cost spike identification → Daily granularity + Group by Service
+Department chargeback → Group by Linked Account or Tags
+RI optimization → Use RI Utilization/Coverage reports
+Regional cost analysis → Group by Region
+Budget planning → Use 12-month forecast feature
+
+Key Facts to Memorize:
+✅ Anomaly threshold: $100 or 40%
+✅ API cost: $0.01 per request
+✅ Historical data: 12 months
+✅ Forecast period: 12 months
+✅ Activation time: 24-48 hours
+✅ Cannot be disabled once enabled
+✅ Three cost types: Unblended, Blended, Amortized
+✅ Minimum spend for anomaly detection: $100
+Integration Questions:
+
+Cost Explorer + AWS Budgets = Spending alerts
+Cost Explorer + Trusted Advisor = Optimization recommendations
+Cost Explorer + Compute Optimizer = Right-sizing guidance
+Cost Explorer + CUR = Detailed billing analysis
