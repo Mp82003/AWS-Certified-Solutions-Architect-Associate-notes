@@ -8,39 +8,35 @@ Cannot be disabled once enabled
 
 Key Features
 Data Analysis
-
 View last 12 months of historical data
 Forecast next 12 months spending
 Get Reserved Instance (RI) purchase recommendations
 Export data as CSV files
 
 Anomaly Detection
-
 Uses machine learning to identify cost anomalies
 Alerts when cost exceeds $100 OR 40% of expected spend
 Detects misconfiguration, usage spikes, or billing errors
 
 
 Access Management (3 Ways)
-
 Management Account: Root user enables for all member accounts
 Cost Explorer Settings: Control access to costs, refunds, credits, discounts, RI recommendations
 IAM Policies: Grant/deny user access after enabling at management level
 
 
 Cost Types
-Cost TypeDescriptionUnblendedUsage cost on the day chargedBlendedUnblended cost + discountsAmortizedUpfront costs spread across billing period (e.g., All-Upfront RI spread over 12 months)
+Cost Type         Description
+Unblended Usage   cost on the day chargedBlended Unblended cost + discounts Amortized Upfront costs spread across billing period (e.g., All-Upfront RI spread over 12 months)
 
 Cost Drivers & Optimization
 Common Drivers:
-
 Number and type of resources
 Region selection
 Time of day usage
 Data transfer volume
 
 Optimization Strategies:
-
 Scale down unused resources
 Use Reserved/Spot Instances
 Move to lower-cost regions
@@ -80,10 +76,7 @@ Exam Tips
 ✅ Understand amortization for upfront RI purchases
 ✅ Cost Explorer cannot be disabled after enabling
 ✅ API calls cost $0.01 each
-✅ Forecasting uses historical data (12 months back/forward)RetryClaude can make mistakes. Please double-check responses.
-
-AWS Cost Explorer Demo - Hands-On Notes
-AWS Certified Solutions Architect Associate
+✅ Forecasting uses historical data (12 months back/forward)
 
 Initial Setup
 
@@ -100,20 +93,16 @@ Stack Chart: Layered view with color-coded services
 Hover over bars to see detailed cost breakdown
 
 2. Date Range & Granularity
-
 Custom date range: Select specific time periods
-Granularity options:
 
+Granularity options:
 Daily: Day-by-day breakdown
 Monthly: Month-by-month view
 Hourly: Only available for paid/non-free-tier accounts
 
-
-
-
 Grouping (Dimensions)
 View costs from different perspectives:
-DimensionShowsServiceCost per AWS service (ELB, WAF, KMS, etc.)RegionCost per AWS regionLinked AccountCost per member accountInstance TypeEC2 instance type breakdownUsage TypeSpecific usage patternsTagsCustom tag-based groupingResourcesIndividual resource costs
+Dimension Shows ServiceCost per AWS service (ELB, WAF, KMS, etc.)RegionCost per AWS regionLinked AccountCost per member accountInstance TypeEC2 instance type breakdownUsage TypeSpecific usage patternsTagsCustom tag-based groupingResourcesIndividual resource costs
 Example: Group by Service → Stack chart shows legend with color codes for each service
 
 Filters
@@ -185,17 +174,14 @@ AWS Budgets (Separate but Related)
 
 Create spending alerts
 Set cost limits
-Budget by:
 
+Budget by:
 Service usage
 Region
 Resource type
 Time period
 
-
-
 Trends
-
 Monthly trends: Cost patterns over months
 Service-wise trends: Usage insights per service
 Requires sufficient historical data
@@ -219,4 +205,3 @@ Multi-region analysis: Filter by Region dimension
 Department chargeback: Group by Linked Account or Tags
 Service optimization: Filter specific service + view trends
 Budget planning: Use forecasts + create custom reports
-RetryClaude can make mistakes. Please double-check responses. Sonnet 4.5
