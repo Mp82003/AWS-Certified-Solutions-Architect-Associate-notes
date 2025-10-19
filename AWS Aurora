@@ -1,0 +1,219 @@
+# AWS Aurora - Solutions Architect Associate Notes
+
+## 🎯 Quick Overview
+Aurora is AWS's managed relational database with two main configurations:
+- **Provisioned** - You manage capacity manually
+- **Serverless** - Auto-scales automatically
+
+---
+
+## 📘 Aurora Serverless V1
+
+### What is it?
+Think of it like **Lambda for databases** - it auto-scales and can pause when not in use.
+
+### Key Features
+- **Auto-scaling** - Scales up/down based on demand
+- **Pause capability** - Stops when idle (saves money!)
+- **Storage decoupled from compute** - They scale independently
+- **6 copies of data** across 3 Availability Zones (super reliable!)
+
+### Perfect Use Cases 🎯
+1. **Infrequent apps** - Low-volume blog sites
+2. **New applications** - Don't know DB size yet
+3. **Variable workloads** - HR, budgeting, reporting apps
+4. **Unpredictable traffic** - Sudden spikes and drops
+5. **Dev/Test databases** - Use during work hours, pause at night
+6. **Multi-tenant apps** - Manages capacity per tenant
+
+### How It Works - ACUs (Aurora Capacity Units)
+- **ACU = 2GB memory + corresponding CPU + networking**
+- Set **minimum ACU** (floor) and **maximum ACU** (ceiling)
+- Storage: Auto-scales from **10GB to 128TB**
+- Uses **warm pool** - pre-warmed resources ready to go instantly!
+
+### Connection Management 💡
+- **Data API endpoint** - Abstracts connection pooling
+- No persistent connections needed
+- Perfect for Lambda/IoT apps that open/close connections rapidly
+- Uses HTTP endpoint backed by connection pool
+
+### Important Limitations ⚠️
+**What V1 CAN'T do:**
+- ❌ Aurora cloning
+- ❌ Global databases
+- ❌ Multi-master clusters
+- ❌ Aurora Replicas
+- ❌ IAM database authentication
+- ❌ Backtracking
+- ❌ Database Activity Streams
+- ❌ Performance Insights
+- ❌ Export snapshots to S3
+- ❌ Connections close after 24 hours
+- ❌ Save/load MySQL data to/from S3 (PostgreSQL CAN load from S3)
+
+---
+
+## 🚀 Aurora Serverless V2 (Generally Available since April 2022)
+
+### Major Improvements Over V1
+
+#### Architecture
+- **V1**: Warm pool based (activates pre-provisioned resources)
+- **V2**: Fine-grained continuous scaling (adds/removes small increments)
+
+#### Scaling Comparison
+| Feature | V1 | V2 |
+|---------|----|----|
+| **Scaling Units** | Whole ACUs | Fractions of ACUs |
+| **Scaling Speed** | Seconds to minutes | Nearly instantaneous |
+| **Granularity** | Coarse-grained | Fine-grained |
+| **Latency** | Some delay | Minimal delay |
+
+#### Performance
+- **V1**: Less predictable due to warm pool dependency
+- **V2**: More consistent, better for high-performance workloads
+
+#### Cost Efficiency
+- **V2 promises 90% cost savings** vs provisioning for peak
+- Fine-grained scaling = better match to actual demand
+- Both can scale to zero when idle
+
+### New Features in V2 ✨
+1. **Aurora Global Databases** support
+2. **Better security** - IAM roles, KMS encryption
+3. **Reader endpoint autoscaling** - Great for read-heavy workloads
+4. **RDS Proxy** for connection management (vs Data API in V1)
+
+### When to Use Which?
+- **V1**: Intermittent/unpredictable spikes, need to scale to zero
+- **V2**: Broader workloads, need consistent performance, global databases
+
+---
+
+## 🌍 Aurora Global Databases
+
+### What is it?
+**One database spanning multiple AWS regions** - think globally distributed!
+
+### Key Specifications
+- **1 Primary region** (read + write)
+- **Up to 5 Secondary regions** (read-only)
+- **Asynchronous replication** with sub-second latency
+- **6 copies of data** per region across 3 AZs
+
+### Benefits 🎁
+
+#### 1. Low Latency Global Reads
+- Users read from their local region
+- Fast access worldwide
+
+#### 2. Disaster Recovery
+- Promote secondary to primary in **under 1 minute**
+- Fast failover from region-wide outages
+
+#### 3. Scalable Secondaries
+- Each secondary supports **up to 16 read replicas** (vs 15 in regular Aurora)
+- Scale each region independently
+
+#### 4. Fast Replication
+- Minimal impact on primary performance
+- Sub-second lag between regions
+
+### "Follow the Sun" Pattern ☀️
+**Real-world example: Global Financial Trading**
+1. **European trading hours** → EU region is primary
+2. **US trading hours** → Switch US region to primary
+3. **Asian trading hours** → Switch Asia region to primary
+4. Promotes secondary to primary in **<1 minute**
+
+### Limitations ⚠️
+- ❌ No Multi-master clusters
+- ❌ Can't use with Serverless V1 (V2 supports it!)
+- ❌ No backtracking
+- ❌ Can't stop/start individual clusters
+- ❌ Must use same Aurora engine version across all regions
+
+---
+
+## 💡 Exam Tips - What to Remember
+
+### Aurora Serverless
+1. **ACU floor and ceiling** - Know how scaling works
+2. **Warm pool** - Instant capacity switching
+3. **Pause feature** - Saves money for idle databases
+4. **Data API** - Connection management abstraction
+5. **Use cases** - Infrequent, variable, unpredictable workloads
+
+### Aurora Global
+1. **1 primary + 5 secondaries max**
+2. **Sub-second replication** between regions
+3. **Promote in <1 minute** for DR
+4. **Follow the Sun** pattern for global apps
+5. **16 replicas per secondary** (vs 15 regular)
+6. **NOT compatible with Serverless V1** (but works with V2!)
+
+### Version Comparison
+- **V1** → Good for cost savings, intermittent workloads
+- **V2** → Better performance, global support, fine-grained scaling
+
+---
+
+## 🎓 Memory Tricks
+
+**Serverless = Lambda for Databases**
+- Auto-scales ✓
+- Pay per use ✓
+- Pause when idle ✓
+
+**ACU = 2GB** (Think: A Computer Unit = 2 Gigs)
+
+**Global = 1+5** (One Primary + Five Secondaries)
+
+**Failover = <1 minute** (Think: Less than 60 seconds to save the world!)
+
+**Storage = 10GB to 128TB** (Starts small, grows HUGE!)
+
+**Copies = 6 across 3 AZs** (Six copies, Three zones = 6÷3=2 per zone)
+
+---
+
+## 📝 Common Exam Scenarios
+
+### Scenario 1: Cost Optimization
+**Question**: "Dev/test database used only 9am-5pm weekdays"
+**Answer**: Aurora Serverless with pause feature
+
+### Scenario 2: Unpredictable Load
+**Question**: "New startup app, unknown database requirements"
+**Answer**: Aurora Serverless (starts small, scales as needed)
+
+### Scenario 3: Global Application
+**Question**: "Users in 4 continents need low-latency reads"
+**Answer**: Aurora Global Database with regional secondaries
+
+### Scenario 4: Disaster Recovery
+**Question**: "Need fast failover across regions"
+**Answer**: Aurora Global (promotes secondary <1 minute)
+
+### Scenario 5: Lambda Integration
+**Question**: "Many Lambda functions causing connection issues"
+**Answer**: Aurora Serverless with Data API endpoint
+
+---
+
+## ⚡ Quick Reference Table
+
+| Feature | Serverless V1 | Serverless V2 | Global |
+|---------|---------------|---------------|--------|
+| Auto-scaling | ✓ | ✓✓ (better) | ✗ |
+| Pause capability | ✓ | ✓ | ✗ |
+| Global database | ✗ | ✓ | ✓ |
+| Scaling speed | Seconds-minutes | Instant | N/A |
+| Max regions | 1 | 1 | 1+5 |
+| Failover time | N/A | N/A | <1 min |
+| Best for | Cost savings | Performance | Global apps |
+
+---
+
+**Remember**: Aurora is all about **automatic management**, **high availability**, and **flexibility**. Choose the right configuration based on your workload pattern!
