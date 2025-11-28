@@ -1,0 +1,61 @@
+                         🌩️ AWS EC2 INSTANCE TYPES (Mind Map)
+
+                                        ┃
+                                        ┃
+                          ┏━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+                          ┃   1. Naming Convention    ┃
+                          ┗━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+                                        ┃
+     ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+     ┃                                                                    ┃
+📌 Instance Family (Letter)         📌 Generation (Number)          📌 Extra Capability Letter
+C = Compute optimized              C5 → 5th gen                    N → Enhanced Networking
+M = General purpose                R6g → ARM based                 D → NVMe SSD
+R = Memory optimized                                                  A → AMD
+P = GPU/Accelerated                                                 G → Graviton ARM
+T = Burstable                                                          Z → High memory
+
+📌 Size (nano, micro, large, xlarge…)
+c5.large / c5.xlarge / c5.4xlarge → CPU + RAM amount
+
+
+               🌟 EC2 INSTANCE FAMILIES (Very Easy Classification)
+
+                                 ┃
+┌────────────────────────────────┼───────────────────────────────┐
+│                                │                               │
+1️⃣ General Purpose              2️⃣ Compute Optimized           3️⃣ Memory Optimized
+Balanced CPU + RAM + Net          High CPU power                  High RAM bandwidth
+Ideal: Web servers, repos         Ideal: Batch jobs, ML           Ideal: In-memory DB, Big Data
+Examples: M7g, M6g, T3            Examples: C7g, C6i, C4          Examples: R5, R6g
+└────────────────────────────────┴───────────────────────────────┘
+
+┌────────────────────────────────┬────────────────────────────────┐
+│ 4️⃣ Accelerated Computing       │ 5️⃣ Storage Optimized           │
+│ GPU / FPGA                      │ Local SSD + High IOPS          │
+│ Ideal: AI/ML, Graphics, HPC     │ Ideal: Databases, Warehouses   │
+│ Examples: P3, P4, F1, VT1       │ Examples: D2, D3, H1           │
+└────────────────────────────────┴────────────────────────────────┘
+
+┌────────────────────────────────┬────────────────────────────────┐
+│ 6️⃣ HPC Optimized               │ 7️⃣ Nitro Instances              │
+│ Supercomputing performance      │ Built on AWS Nitro system      │
+│ Ideal: Simulations, Weather     │ High security + performance    │
+│ Examples: HPC6id, HPC6a         │ Examples: C5, C5n, M5, T3      │
+└────────────────────────────────┴────────────────────────────────┘
+
+                     8️⃣ ARM-Based (Graviton / g Instances)
+                     ARM CPUs → Fast + Cost effective
+                     Ideal: Web servers, containers, microservices
+                     Examples: A1, M6g, C6g, R6g
+
+                   ⭐ WHY INSTANCE TYPE MATTERS (Cost Impact)
+
+✔ More CPU → More cost
+✔ More RAM → More cost
+✔ GPU → Most expensive
+✔ Local SSD (NVMe) → Extra cost
+👉 Correct instance = Better performance + Lower cost
+
+
+
