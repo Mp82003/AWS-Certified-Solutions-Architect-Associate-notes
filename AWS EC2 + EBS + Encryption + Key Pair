@@ -326,3 +326,255 @@ D. .crt
 
 Answer: B
 Explanation: EC2 uses .pem keys.
+
+
+
+
+What is EC2 Instance Store?
+
+Ephemeral local block storage directly attached to the physical host of the EC2 instance.
+
+Temporary storage → data lost if instance is stopped, terminated, or fails.
+
+Unlike EBS (persistent), instance store → non-persistent.
+
+2. Why do we need Instance Store?
+✔ High Performance
+
+Physically attached → very low latency.
+
+Ideal for high throughput, IO-intensive & temporary data.
+
+✔ Best Use Cases
+
+Cache
+
+Buffer
+
+Scratch space
+
+Temporary processing files
+
+Applications that can recreate data
+
+Big data processing / Hadoop
+
+High-performance workloads
+
+3. Important Characteristics
+❗ Data Loss
+
+Data disappears when:
+
+Instance stops
+
+Instance terminates
+
+Host fails
+
+Instance store volume is unmapped
+
+❗ Not for Boot Volume
+
+EC2 instance store cannot be used as OS boot disk.
+
+Booting from instance store = slow + unreliable (exam reminder).
+
+4. Limitations
+
+Not available for all EC2 instance types
+(e.g., T2, T3 don’t have instance store)
+
+Capacity is fixed at launch time, cannot resize later.
+
+No snapshots or persistent backup like EBS.
+
+Must handle backup/recovery manually if needed.
+
+5. Block Device Mapping
+
+When launching an instance, you can configure instance store volumes using block device mapping.
+
+Instance store → appears as additional NVMe/SCSI devices.
+
+6. Comparison with EBS
+Feature                 	Instance Store                       	EBS
+Persistence	               ❌ Temporary                	✔ Persistent
+Data Loss	                    On stop/terminate         	Retains data
+Performance	                 Very high	                   High but less than instance store
+Backup                     	Manual	                      Snapshots
+Resize                      	❌ No                      	✔ Yes
+Boot Volume               	❌ Not recommended           	✔ YES
+
+
+7. When to Use Instance Store
+Use when:
+Data is non-critical
+You need extreme IO speed
+Application can recreate data
+You need cheap, fast, temporary storage
+
+Do NOT use when:
+You need permanent storage
+Data must survive stops/terminations
+You require snapshots/backups
+
+8. Key Exam Tricks
+Instance store = ephemeral = temporary
+Not all EC2 types have instance store
+Data lost on stop/terminate
+Can’t resize instance store
+Best for cache/buffer/scratch
+
+.
+
+✅ EC2 Instance Store – MCQs (With Answers + Explanations)
+1. EC2 Instance Store is best described as:
+
+A. Persistent block storage
+B. Temporary block storage attached to the physical server
+C. Object storage for EC2
+D. Network-attached storage
+
+Answer: B
+✔ Instance Store = ephemeral local block storage physically attached to the host.
+
+2. What happens to data stored on an Instance Store volume when an EC2 instance is stopped?
+
+A. Data persists automatically
+B. Data is moved to S3
+C. Data is lost
+D. Data is snapshot automatically
+
+Answer: C
+✔ Instance store data is lost on stop/terminate.
+
+3. Which of the following is a good use case for Instance Store?
+
+A. Storing long-term backups
+B. Database storage requiring persistence
+C. Cache or temporary buffer
+D. Storing AMIs
+
+Answer: C
+✔ Cache/buffer/scratch space = ideal for instance store.
+
+4. Can an EC2 Instance Store volume be resized after instance launch?
+
+A. Yes
+B. No
+C. Only if encrypted
+D. Only with Auto Scaling
+
+Answer: B
+✔ Capacity is fixed at launch.
+
+5. Which EC2 storage type supports snapshots?
+
+A. Only instance store
+B. Only EBS
+C. Both EBS and instance store
+D. None
+
+Answer: B
+✔ Only EBS supports snapshots. Instance store does NOT.
+
+6. Does every EC2 instance type come with Instance Store volumes?
+
+A. Yes
+B. No
+C. Yes, but only in shared tenancy
+D. Yes, but only if requested via support
+
+Answer: B
+✔ Many instances (e.g., T2/T3) do not have instance store.
+
+7. Instance Store volumes are physically located where?
+
+A. On S3
+B. On EBS servers
+C. On the EC2 instance's host hardware
+D. In another AZ
+
+Answer: C
+✔ Instance store is direct-attached hardware storage.
+
+8. Which statement is TRUE about EC2 Instance Store?
+
+A. Data is replicated across AZs
+B. Instance Store can be used as boot volume
+C. Suitable for high-speed temporary data
+D. Data survives instance termination
+
+Answer: C
+✔ High-speed temporary storage for IO-intensive workloads.
+
+9. If the physical host of EC2 fails, what happens to instance store data?
+
+A. It is backed up automatically
+B. It persists regardless
+C. It is lost
+D. It is moved to EBS
+
+Answer: C
+✔ Host failure = instance store wiped out.
+
+10. Which is NOT a recommended use case for Instance Store?
+
+A. Temporary data
+B. Hadoop clusters
+C. Container scratch space
+D. Storing critical persistent logs
+
+Answer: D
+✔ Critical logs require EBS, not ephemeral storage.
+
+11. Instance Store volume capacity:
+
+A. Can be increased anytime
+B. Can be decreased anytime
+C. Is fixed at instance launch
+D. Depends on AMI size
+
+Answer: C
+✔ Cannot resize instance store.
+
+12. What must you check before planning to use Instance Store?
+
+A. AMI version
+B. Whether instance type supports instance store
+C. Region
+D. VPC configuration
+
+Answer: B
+✔ Some instance families (like T-series) don’t have instance store.
+
+13. During instance launch, Instance Store volumes are attached through:
+
+A. Elastic network interface mapping
+B. Block device mapping
+C. IAM role mapping
+D. Route tables
+
+Answer: B
+✔ Block device mapping = where you configure instance store.
+
+14. Which characteristic makes Instance Store high-performance?
+
+A. Integrated with S3
+B. It uses NVMe/SATA drives physically attached
+C. Data replication across hosts
+D. Uses KMS encryption by default
+
+Answer: B
+✔ Physical NVMe/SATA drives → super low latency.
+
+15. Instance Store is ideal for which scenario?
+
+A. Long-term relational database
+B. File storage requiring durability
+C. Temporary scratch disk for processing
+D. Storing API keys
+
+Answer: C
+✔ Only for temporary, fast IO workloads.
