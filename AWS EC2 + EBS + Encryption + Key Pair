@@ -1,0 +1,328 @@
+. EBS (Elastic Block Store) — Key Points (Exam Focus)
+📌 Definition
+
+EBS = Durable block-level storage that attaches to EC2.
+
+Works like a hard disk for EC2.
+
+📌 Key Features
+
+Block storage → low latency reads/writes.
+
+Attached to a single EC2 (except Multi-Attach for io2).
+
+Persists even after EC2 stops/terminates (unless delete-on-termination=true).
+
+Can attach multiple EBS volumes to a single EC2.
+
+Volume and EC2 must be in same AZ (Exam HOT).
+
+2. EBS Volume Modifications
+
+You can modify LIVE volumes (no downtime):
+
+Increase Size
+
+Increase IOPS
+
+Change Volume Type (gp2 → gp3, gp3 → io1 etc.)
+
+👉 Exam Tip: Only works for current generation EC2 + EBS.
+
+3. Use Cases
+
+OS boot volume
+
+Databases (MySQL/Postgres)
+
+Applications needing frequent updates
+
+High-throughput workloads (log processing, analytics)
+
+4. EBS Multi-Attach (Exam-Specific)
+
+Supported ONLY for io2 volumes
+
+Can attach one EBS volume to multiple EC2 instances (same AZ).
+
+For clustered Linux apps, shared file systems.
+
+NOT for Windows, NOT for root volume.
+
+5. EBS Encryption (AES-256 + KMS)
+📌 Uses KMS Keys
+
+Encryption uses AWS KMS.
+
+Algorithm: AES-256 (Exam must-remember).
+
+📌 Encryption happens on EC2 host
+
+NOT on EBS.
+
+So data at rest + data in transit (EC2 → EBS) is encrypted.
+
+📌 What Gets Encrypted Automatically
+
+Data inside the EBS volume
+
+Data in transit between EC2 ↔ EBS
+
+Snapshots of encrypted volumes
+
+Volumes created from encrypted snapshots
+
+👉 Exam Trick:
+Encrypted → snapshot is encrypted → new volume is encrypted.
+Unencrypted → snapshot unencrypted unless explicitly encrypted.
+
+6. How to Encrypt an Existing Unencrypted Volume
+
+Steps:
+
+Take snapshot (unencrypted)
+
+Copy snapshot → choose Encrypt
+
+Create new volume from encrypted snapshot
+
+Attach to EC2
+
+7. EC2 Key Pairs (SSH Authentication)
+📌 Key Pair = Public Key + Private Key
+
+Used for SSH authentication into EC2.
+
+Public Key
+
+Stored on EC2 instance under:
+
+~/.ssh/authorized_keys
+
+Private Key (.pem file)
+
+Stored by you
+
+Required for SSH login
+
+If lost → cannot recover (Exam point)
+
+Login Requirement
+ssh -i mykey.pem ec2-user@public-ip
+
+Security Rule
+
+Never check .pem into GitHub.
+
+Anyone with private key gets full access.
+
+8. Boot Behavior
+
+When EC2 boots first time, it injects the public key into the OS.
+
+For Linux:
+
+Default users: ec2-user, ubuntu, centos, etc.
+
+9. Common Exam Use Cases
+Case 1: Lost Private Key
+
+❌ You can’t recover it
+✔ Only solution:
+
+Create new key pair
+
+Stop instance
+
+Detach root volume
+
+Attach to another EC2
+
+Add new public key manually
+
+Reattach and boot
+
+Case 2: Need to Encrypt Existing Volume
+
+Snapshot → Copy snapshot (encrypted) → Create new volume
+
+Case 3: EC2 can't access unencrypted + encrypted volumes together?
+
+✔ It CAN. (Exam trick question)
+
+Case 4: Same EBS volume attached to multiple EC2?
+
+✔ Only using io2 Multi-Attach
+
+❌ Not supported for boot/root volume
+
+Case 5: EBS AZ Restriction
+
+Volume & EC2 must be in same AZ
+
+10. Super Quick Revision (30 Seconds Before Exam)
+
+EBS = Block storage
+
+S3 = Object storage
+
+Encryption = KMS + AES-256
+
+Encryption covers: data at rest + transit + snapshots + derived volumes
+
+Modify EBS volume live (size/IOPS/type)
+
+Multi-Attach → io2 volume ⇒ multiple EC2
+
+Lose private key = no recovery
+
+Key injected to: ~/.ssh/authorized_keys
+
+
+MCQs: EC2 + EBS + Encryption + Key Pairs
+1. EBS is what type of storage?
+
+A. Object-level storage
+B. File-level storage
+C. Block-level storage
+D. Queue storage
+
+Answer: C
+Explanation: EBS = block storage, S3 = object, EFS = file.
+
+2. When you stop an EC2 instance, what happens to its EBS volume by default?
+
+A. Deleted immediately
+B. Persists unless “delete on termination” is enabled
+C. Encrypted automatically
+D. Converted to S3 storage
+
+Answer: B
+Explanation: Root EBS volume persists unless delete-flag is set.
+
+3. Which algorithm is used for EBS encryption?
+
+A. RSA-2048
+B. AES-128
+C. AES-256
+D. SHA-256
+
+Answer: C
+Explanation: AWS uses AES-256 with KMS.
+
+4. Where does EBS encryption happen?
+
+A. Inside the EBS volume
+B. On the EC2 host
+C. On S3
+D. In the client machine
+
+Answer: B
+Explanation: Encryption happens on the server (EC2 hypervisor layer).
+
+5. Which of the following gets encrypted automatically when an EBS encrypted volume is used?
+
+A. Data in the instance RAM
+B. Snapshots
+C. Security groups
+D. IAM roles
+
+Answer: B
+Explanation: Encrypted volume → encrypted snapshot → encrypted new volumes.
+
+6. You want to attach one EBS volume to multiple EC2 instances simultaneously. Which volume type is required?
+
+A. gp2
+B. gp3
+C. io1
+D. io2
+
+Answer: D
+Explanation: Only io2 supports Multi-Attach.
+
+7. To attach an EBS volume to an EC2 instance, what must match?
+
+A. VPC IDs
+B. AMI IDs
+C. Availability Zone
+D. Region
+
+Answer: C
+Explanation: EBS volumes are AZ-scoped, not region-scoped.
+
+8. What happens if you lose your EC2 private key (.pem)?
+
+A. AWS support can recover it
+B. You can download it again
+C. You cannot recover it
+D. You can regenerate it on instance
+
+Answer: C
+Explanation: Lost private key = zero recovery.
+
+9. How is the public key injected into a Linux EC2 instance?
+
+A. IAM role
+B. Stored in S3
+C. Placed in ~/.ssh/authorized_keys during first boot
+D. Sent via email
+
+Answer: C
+
+10. Which is true about EC2 key pairs?
+
+A. Private key stored by AWS
+B. Public key stored by user
+C. Private key stored by user
+D. You can recover private key anytime
+
+Answer: C
+Explanation: AWS keeps public, you keep private.
+
+11. You want to encrypt an existing unencrypted EBS volume. What is the correct method?
+
+A. Turn on encryption in-place
+B. Reboot instance
+C. Snapshot → Copy snapshot (encrypt) → Create new volume
+D. Use IAM policy
+
+Answer: C
+Explanation: Only snapshot-copy-encrypt works.
+
+12. Which of the following can be modified on a live EBS volume?
+
+A. Size only
+B. Size + IOPS + Volume Type
+C. Nothing; must stop instance
+D. Only IOPS
+
+Answer: B
+Explanation: EBS allows live modifications.
+
+13. Encrypted and unencrypted EBS volumes can be attached to the same EC2 instance?
+
+A. Yes
+B. No
+
+Answer: A
+Explanation: They can coexist. Exam trick.
+
+14. When you take an unencrypted snapshot of a volume, it will be:
+
+A. Always encrypted
+B. Always unencrypted
+C. Encrypted automatically if volume > 100 GB
+D. Randomly encrypted
+
+Answer: B
+Explanation: Snapshot inherits encryption state.
+
+15. To SSH into a Linux EC2 instance, which file is required?
+
+A. .txt
+B. .pem
+C. .ppk
+D. .crt
+
+Answer: B
+Explanation: EC2 uses .pem keys.
