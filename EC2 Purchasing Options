@@ -1,0 +1,194 @@
+1️⃣ On-Demand Instances
+
+✔ Default option
+✔ Pay per second/hour
+✔ No long-term commitment
+✔ Highest cost, highest flexibility
+
+📌 Best For:
+
+Unpredictable workloads
+
+Short experiments / testing
+
+First-time deployments
+
+2️⃣ Reserved Instances (RI)
+
+✔ Commit to 1 year or 3 years
+✔ Up to 75% cheaper than On-Demand
+✔ Steady, predictable workloads
+✔ Can choose Standard RI or Convertible RI
+
+✔ RI Payment Types
+Payment Option	Discount	Notes
+All Upfront	Highest	Pay full cost upfront
+Partial Upfront	Medium	Part upfront + monthly
+No Upfront	Lowest	Monthly only
+
+⚠️ Performance same for all payment modes.
+
+📌 Best For:
+
+Long-running apps
+
+Stable usage (e.g., RDS, web servers)
+
+3️⃣ Spot Instances
+
+✔ Up to 90% cheaper
+✔ Uses unused EC2 capacity
+✔ Can be terminated with 2-minute warning
+
+📌 Best For:
+
+Batch jobs
+
+Big data processing
+
+Stateless apps
+
+Fault-tolerant workloads
+
+⚠️ Not recommended for:
+
+Databases
+
+Long transactions
+
+Critical apps
+
+4️⃣ Dedicated Hosts (pricing category)
+
+✔ Pay for entire physical server
+✔ You control instance placement
+✔ Needed for license-restricted software (BYOL: Oracle, SQL Server)
+
+🟪 2. EC2 Savings Plans (EXTREMELY IMPORTANT)
+
+Savings Plans = Newer alternative to RIs with FAR more flexibility.
+
+✔ Save up to 72%
+✔ Commit to spend $ per hour for 1 or 3 years
+✔ Auto-applies to EC2, Fargate, Lambda
+
+Savings Plans Types
+1️⃣ Compute Savings Plan (MOST FLEXIBLE)
+
+✔ Applies to ANY EC2 instance, any:
+
+Region
+
+Instance family
+
+OS
+
+Size
+
+✔ Covers Fargate + Lambda
+
+📌 Best For:
+
+Multi-region deployments
+
+Changing architectures
+
+Serverless + EC2 mix
+
+2️⃣ EC2 Instance Savings Plan
+
+✔ Applies to specific instance family in a region
+(e.g., M5 family in ap-south-1)
+
+✔ You can change:
+
+Instance size (m5.large → m5.xlarge)
+
+OS
+
+Tenancy
+
+📌 Best For:
+
+Stable EC2 workloads
+
+Always using same family
+
+3️⃣ SageMaker Savings Plan
+
+✔ Save up to 64%
+✔ Automatically applies to SageMaker usage
+
+Savings Plan Payment Options
+
+(Same as Reserved Instances)
+
+All Upfront
+
+Partial Upfront
+
+No Upfront
+
+⚠ Saving Plans cannot be canceled or refunded.
+
+🟩 3. EC2 Tenancy Models (HIGH EXAM WEIGHT)
+
+Tenancy determines where your EC2 instance runs physically.
+
+1️⃣ Shared Tenancy (Default)
+
+✔ Multiple AWS customers share same physical host
+✔ Safest + cheapest
+✔ Virtual isolation maintained
+
+📌 Best For:
+Almost all workloads
+
+2️⃣ Dedicated Instances
+
+✔ Your instances run on hardware not shared with others
+✔ AWS chooses placement
+✔ More expensive than shared
+
+📌 Best For:
+
+Compliance workloads
+
+When you need isolation but don’t care about host control
+
+3️⃣ Dedicated Host
+
+✔ Full physical server dedicated to you
+✔ You manage placement
+✔ Good for Bring Your Own License (BYOL)
+✔ Most expensive option
+
+📌 Best For:
+
+Oracle / SQL server licensing
+
+Enterprise compliance restrictions
+
+Host-level visibility needed
+
+Dedicated Host vs Dedicated Instance
+Feature	Dedicated Host	Dedicated Instance
+You control host	Yes	No
+BYOL license support	Yes	Limited
+Pricing	Highest	High
+Instance placement visibility	Yes	No
+🟧 4. Exam-Important Comparisons
+🔥 On-Demand vs RI vs Spot vs Savings Plans
+Option            	Cost	                Commitment	         Interruptions?	                    Best For
+On-Demand         	High	               None	                     No	                         Unpredictable
+Reserved Instances	Medium	             1–3 yrs	                 No                        	Steady workloads
+Savings Plans	      Medium-Low	         1–3 yrs                  	No	                      Flexible workloads
+Spot	              Lowest	             None	                     Yes (2-min warning)	        Batch, big data
+🟥 5. Common SAA-C03 Exam Traps
+
+✔ Spot instances = terminated anytime → DO NOT use for DB or stateful services
+✔ Tenancy cannot be changed after launch
+✔ Compute Savings Plan = MOST flexible
+✔ RIs require you to choose instance family & region (unless Convertible RI)
+✔ Dedicated Hosts = required for BYOL
+✔ Savings Plans apply to EC2, Lambda, Fargate (RIs do NO
