@@ -1,0 +1,259 @@
+1. What Are IP Addresses in AWS VPC?
+IP addresses allow resources in your VPC to communicate:
+Within the VPC (private communication)
+To the internet (public communication)
+AWS uses IPv4 by default (IPv6 optional).
+When creating a VPC, you must assign a CIDR block
+Example: 172.31.0.0/16
+
+2. Private IPv4 Addresses
+✔ Not reachable from the internet
+Used for internal communication within VPC.
+✔ Examples
+EC2 ↔ EC2 inside VPC
+EC2 ↔ RDS
+EC2 in private subnet accessing NAT gateway
+
+✔ Assigned from your VPC/subnet CIDR
+Example:
+10.0.1.25
+
+✔ Persistent
+Stays with EC2 even after stop/start
+Lost only when EC2 is terminated
+
+3. Public IPv4 Addresses
+✔ Reachable from the internet
+Mapped to private IP via NAT (1:1)
+
+Key Facts
+Assigned automatically when launching EC2 in public subnet
+Taken from AWS public IP pool (NOT your AWS account)
+Cannot be manually detached or moved
+Changes on every stop/start (not persistent)
+
+4. Elastic IP Address (EIP)
+✔ Static, Persistent Public IPv4
+Allocated to your AWS account, not to AWS pool.
+
+Why Use Elastic IP?
+Need a consistent public IP
+Instance replacement/failover scenarios
+(move EIP from EC2 #1 → EC2 #2 instantly)
+
+Key Exam Rules
+Always IPv4 only
+(No Elastic IP for IPv6)
+When EIP attaches to EC2:
+→ public IPv4 is released automatically
+Charged when not attached to a running instance
+(To prevent wasting public IPv4 space)
+
+5. IPv4 vs IPv6 (Important Differences)
+Feature         	            IPv4	                                       IPv6
+VPC CIDR size            	/16 to /28	                               Always /56
+Subnet CIDR size	        /16 to /28	                               Always /64
+Public/Private distinction	Yes                             	No — all IPv6 are public
+Elastic IP supported?	    ✔ Yes	                                          ❌ No
+Internet access	Needs       IGW & public IP                       	Needs IGW only
+
+Critical Exam Point
+👉 IPv6 = Always public. No private IPv6. No EIP.
+
+6. Internet Access Requirements
+For IPv4
+Instance needs:
+Public IPv4 or EIP
+Internet Gateway (IGW)
+Route table: 0.0.0.0/0 → IGW
+
+For IPv6
+Instance needs:
+IPv6 assigned
+Internet Gateway
+Route: ::/0 → IGW
+
+7. Public IP vs Elastic IP (Side-by-Side)
+Feature                         	Public IP	                               Elastic IP
+Changes on stop/start         	✔ Yes	                                           ❌ No
+Owned by	                       AWS pool	                                      Your account
+Can be moved between instances     	❌ No	                                         ✔ Yes
+Manual attach/detach               	❌ No	                                          ✔ Yes
+Charges when unused?	             ❌ No                                          	✔ Yes
+
+Use case	Basic internet access	Need permanent IP
+8. Exam Trick Scenarios
+Scenario 1 – Need fixed IP for a web app
+→ Use Elastic IP
+Scenario 2 – EC2 restarts and gets new IP
+→ Because it used Public IP, not EIP
+
+Scenario 3 – IPv6 instance needs static IP
+→ IPv6 is ALWAYS static
+→ No Elastic IP support
+
+Scenario 4 – Want to assign public IP manually?
+→ Cannot. Public IP is AWS-managed.
+
+9. One-Line Definitions (Exam Revision)
+Private IP → internal only, no internet
+Public IP → internet access, changes on restart
+Elastic IP → static public IP, account-owned
+IPv6 → always public, no EIP support
+
+10. Ultra Short Summary (Memory Trick)
+P – P – E
+Private = Private use
+Public = Pool from AWS, Poof! Changes on restart
+EIP = Eternal (static)
+
+
+1. An EC2 instance in a public subnet must have which of the following to connect to the internet?
+
+A. Private IP + NAT Gateway
+B. Public IPv4 + Internet Gateway
+C. Private IPv6 + NAT Instance
+D. VPC Peering
+
+Answer: B
+Explanation: Public subnet internet access = public IPv4 (or EIP) + IGW + valid route.
+
+2. You stop and start an EC2 instance that had a PUBLIC IP. What happens to its public IP?
+
+A. It stays the same
+B. It changes
+C. It becomes an Elastic IP
+D. It is converted to IPv6
+
+Answer: B
+Explanation: Public IPv4 → changes on every stop/start.
+
+3. You want a permanent public IP that does NOT change even if EC2 restarts or is replaced. What should you use?
+
+A. Public IPv4
+B. Private IPv4
+C. Elastic IP
+D. Secondary Network Interface
+
+Answer: C
+Explanation: Elastic IP = persistent, static public IPv4.
+
+4. Which is TRUE about IPv6 addresses in AWS?
+
+A. They cannot reach the internet
+B. They support Elastic IP addresses
+C. They are always public
+D. They change on every restart
+
+Answer: C
+Explanation: IPv6 = always global public, no private IPv6, no EIPs.
+
+5. Where do public IPv4 addresses come from?
+
+A. Customer's AWS account
+B. Regional pool of the VPC
+C. Amazon’s pool of public IPv4 addresses
+D. Manually selected during launch
+
+Answer: C
+Explanation: Public IPs are assigned from AWS public IP pool, not customer-owned.
+
+6. An Elastic IP is charged when:
+
+A. It is attached to a running instance
+B. It is attached to a stopped instance
+C. It is allocated but NOT attached to any running instance
+D. It is used with IPv6
+
+Answer: C
+Explanation: AWS charges for unused EIPs to avoid waste.
+
+7. Which CIDR block size is allowed for an IPv6 VPC block?
+
+A. /16
+B. /28
+C. /56
+D. /64
+
+Answer: C
+Explanation: IPv6 VPC block → always /56
+
+8. A private IPv4 address is used for:
+
+A. Internet traffic
+B. Communication inside the VPC
+C. Assigning permanent global IP
+D. DNS routing only
+
+Answer: B
+Explanation: Private IPs are internal-only.
+
+9. A company needs to switch traffic from one EC2 instance to another during a failure. Which AWS feature makes this easy?
+
+A. Auto Scaling Group
+B. Subnet routing
+C. Elastic IP
+D. VPC Peering
+
+Answer: C
+Explanation: You can move Elastic IP from EC2 #1 to EC2 #2 instantly.
+
+10. Which of the following is NOT true about Public IPs?
+
+A. They are assigned from AWS pool
+B. They are released when the instance is stopped
+C. They are persistent
+D. They cannot be manually detached
+
+Answer: C
+Explanation: Public IPs are NOT persistent.
+
+11. You want an EC2 instance in a private subnet to access the internet. Which is required?
+
+A. Elastic IP
+B. Internet Gateway
+C. NAT Gateway
+D. IPv6
+
+Answer: C
+Explanation: Private subnet → outbound internet → NAT Gateway
+
+12. How many IPv6 CIDRs can you assign per subnet?
+
+A. 1
+B. 2
+C. 64
+D. Unlimited
+
+Answer: A
+Explanation: Subnet gets one IPv6 /64 CIDR.
+
+13. You attach an Elastic IP to an EC2 instance. What happens to its public IP?
+
+A. It remains active
+B. It is converted into an EIP
+C. It is released back to AWS
+D. It becomes private
+
+Answer: C
+Explanation: EIP replaces public IP → original public IP is released.
+
+14. Can you convert an automatically assigned public IPv4 into an Elastic IP?
+
+A. Yes
+B. No
+C. Only in public subnets
+D. Only during launch
+
+Answer: B
+Explanation: Cannot convert public IP ↔ EIP.
+
+15. Which of the following is TRUE for IPv6 assigned to an EC2 instance?
+
+A. It changes on stop/start
+B. It is released when instance terminates
+C. It acts as a private IP
+D. Requires NAT Gateway
+
+Answer: B
+Explanation: IPv6 persists on stop/start but released on termination.
