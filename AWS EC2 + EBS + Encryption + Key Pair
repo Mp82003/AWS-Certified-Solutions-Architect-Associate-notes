@@ -1,75 +1,47 @@
 . EBS (Elastic Block Store) — Key Points (Exam Focus)
 📌 Definition
-
 EBS = Durable block-level storage that attaches to EC2.
-
 Works like a hard disk for EC2.
 
 📌 Key Features
-
 Block storage → low latency reads/writes.
-
 Attached to a single EC2 (except Multi-Attach for io2).
-
 Persists even after EC2 stops/terminates (unless delete-on-termination=true).
-
 Can attach multiple EBS volumes to a single EC2.
-
 Volume and EC2 must be in same AZ (Exam HOT).
 
 2. EBS Volume Modifications
-
 You can modify LIVE volumes (no downtime):
-
 Increase Size
-
 Increase IOPS
-
 Change Volume Type (gp2 → gp3, gp3 → io1 etc.)
-
 👉 Exam Tip: Only works for current generation EC2 + EBS.
 
 3. Use Cases
-
 OS boot volume
-
 Databases (MySQL/Postgres)
-
 Applications needing frequent updates
-
 High-throughput workloads (log processing, analytics)
 
 4. EBS Multi-Attach (Exam-Specific)
-
 Supported ONLY for io2 volumes
-
 Can attach one EBS volume to multiple EC2 instances (same AZ).
-
 For clustered Linux apps, shared file systems.
-
 NOT for Windows, NOT for root volume.
 
 5. EBS Encryption (AES-256 + KMS)
 📌 Uses KMS Keys
-
 Encryption uses AWS KMS.
-
 Algorithm: AES-256 (Exam must-remember).
 
 📌 Encryption happens on EC2 host
-
 NOT on EBS.
-
 So data at rest + data in transit (EC2 → EBS) is encrypted.
 
 📌 What Gets Encrypted Automatically
-
 Data inside the EBS volume
-
 Data in transit between EC2 ↔ EBS
-
 Snapshots of encrypted volumes
-
 Volumes created from encrypted snapshots
 
 👉 Exam Trick:
@@ -77,324 +49,229 @@ Encrypted → snapshot is encrypted → new volume is encrypted.
 Unencrypted → snapshot unencrypted unless explicitly encrypted.
 
 6. How to Encrypt an Existing Unencrypted Volume
-
 Steps:
-
 Take snapshot (unencrypted)
-
 Copy snapshot → choose Encrypt
-
 Create new volume from encrypted snapshot
-
 Attach to EC2
 
 7. EC2 Key Pairs (SSH Authentication)
 📌 Key Pair = Public Key + Private Key
-
 Used for SSH authentication into EC2.
-
 Public Key
-
 Stored on EC2 instance under:
-
 ~/.ssh/authorized_keys
-
 Private Key (.pem file)
-
 Stored by you
-
 Required for SSH login
-
 If lost → cannot recover (Exam point)
-
 Login Requirement
 ssh -i mykey.pem ec2-user@public-ip
-
 Security Rule
-
 Never check .pem into GitHub.
-
 Anyone with private key gets full access.
 
 8. Boot Behavior
-
 When EC2 boots first time, it injects the public key into the OS.
 
 For Linux:
-
 Default users: ec2-user, ubuntu, centos, etc.
 
 9. Common Exam Use Cases
 Case 1: Lost Private Key
-
 ❌ You can’t recover it
 ✔ Only solution:
-
 Create new key pair
-
 Stop instance
-
 Detach root volume
-
 Attach to another EC2
-
 Add new public key manually
-
 Reattach and boot
 
 Case 2: Need to Encrypt Existing Volume
-
 Snapshot → Copy snapshot (encrypted) → Create new volume
 
 Case 3: EC2 can't access unencrypted + encrypted volumes together?
-
 ✔ It CAN. (Exam trick question)
 
 Case 4: Same EBS volume attached to multiple EC2?
-
 ✔ Only using io2 Multi-Attach
 
 ❌ Not supported for boot/root volume
 
 Case 5: EBS AZ Restriction
-
 Volume & EC2 must be in same AZ
 
 10. Super Quick Revision (30 Seconds Before Exam)
-
 EBS = Block storage
-
 S3 = Object storage
-
 Encryption = KMS + AES-256
-
 Encryption covers: data at rest + transit + snapshots + derived volumes
-
 Modify EBS volume live (size/IOPS/type)
-
 Multi-Attach → io2 volume ⇒ multiple EC2
-
 Lose private key = no recovery
-
 Key injected to: ~/.ssh/authorized_keys
 
 
 MCQs: EC2 + EBS + Encryption + Key Pairs
 1. EBS is what type of storage?
-
 A. Object-level storage
 B. File-level storage
 C. Block-level storage
 D. Queue storage
-
 Answer: C
 Explanation: EBS = block storage, S3 = object, EFS = file.
 
 2. When you stop an EC2 instance, what happens to its EBS volume by default?
-
 A. Deleted immediately
 B. Persists unless “delete on termination” is enabled
 C. Encrypted automatically
 D. Converted to S3 storage
-
 Answer: B
 Explanation: Root EBS volume persists unless delete-flag is set.
 
 3. Which algorithm is used for EBS encryption?
-
 A. RSA-2048
 B. AES-128
 C. AES-256
 D. SHA-256
-
 Answer: C
 Explanation: AWS uses AES-256 with KMS.
 
 4. Where does EBS encryption happen?
-
 A. Inside the EBS volume
 B. On the EC2 host
 C. On S3
 D. In the client machine
-
 Answer: B
 Explanation: Encryption happens on the server (EC2 hypervisor layer).
 
 5. Which of the following gets encrypted automatically when an EBS encrypted volume is used?
-
 A. Data in the instance RAM
 B. Snapshots
 C. Security groups
 D. IAM roles
-
 Answer: B
 Explanation: Encrypted volume → encrypted snapshot → encrypted new volumes.
 
 6. You want to attach one EBS volume to multiple EC2 instances simultaneously. Which volume type is required?
-
 A. gp2
 B. gp3
 C. io1
 D. io2
-
 Answer: D
 Explanation: Only io2 supports Multi-Attach.
 
 7. To attach an EBS volume to an EC2 instance, what must match?
-
 A. VPC IDs
 B. AMI IDs
 C. Availability Zone
 D. Region
-
 Answer: C
 Explanation: EBS volumes are AZ-scoped, not region-scoped.
 
 8. What happens if you lose your EC2 private key (.pem)?
-
 A. AWS support can recover it
 B. You can download it again
 C. You cannot recover it
 D. You can regenerate it on instance
-
 Answer: C
 Explanation: Lost private key = zero recovery.
 
 9. How is the public key injected into a Linux EC2 instance?
-
 A. IAM role
 B. Stored in S3
 C. Placed in ~/.ssh/authorized_keys during first boot
 D. Sent via email
-
 Answer: C
 
 10. Which is true about EC2 key pairs?
-
 A. Private key stored by AWS
 B. Public key stored by user
 C. Private key stored by user
 D. You can recover private key anytime
-
 Answer: C
 Explanation: AWS keeps public, you keep private.
 
 11. You want to encrypt an existing unencrypted EBS volume. What is the correct method?
-
 A. Turn on encryption in-place
 B. Reboot instance
 C. Snapshot → Copy snapshot (encrypt) → Create new volume
 D. Use IAM policy
-
 Answer: C
 Explanation: Only snapshot-copy-encrypt works.
 
 12. Which of the following can be modified on a live EBS volume?
-
 A. Size only
 B. Size + IOPS + Volume Type
 C. Nothing; must stop instance
 D. Only IOPS
-
 Answer: B
 Explanation: EBS allows live modifications.
 
 13. Encrypted and unencrypted EBS volumes can be attached to the same EC2 instance?
-
 A. Yes
 B. No
-
 Answer: A
 Explanation: They can coexist. Exam trick.
 
 14. When you take an unencrypted snapshot of a volume, it will be:
-
 A. Always encrypted
 B. Always unencrypted
 C. Encrypted automatically if volume > 100 GB
 D. Randomly encrypted
-
 Answer: B
 Explanation: Snapshot inherits encryption state.
 
 15. To SSH into a Linux EC2 instance, which file is required?
-
 A. .txt
 B. .pem
 C. .ppk
 D. .crt
-
 Answer: B
 Explanation: EC2 uses .pem keys.
 
 
 
-
 What is EC2 Instance Store?
-
 Ephemeral local block storage directly attached to the physical host of the EC2 instance.
-
 Temporary storage → data lost if instance is stopped, terminated, or fails.
-
 Unlike EBS (persistent), instance store → non-persistent.
 
 2. Why do we need Instance Store?
 ✔ High Performance
-
 Physically attached → very low latency.
-
 Ideal for high throughput, IO-intensive & temporary data.
 
 ✔ Best Use Cases
-
 Cache
-
 Buffer
-
 Scratch space
-
 Temporary processing files
-
 Applications that can recreate data
-
 Big data processing / Hadoop
-
 High-performance workloads
 
 3. Important Characteristics
 ❗ Data Loss
-
 Data disappears when:
-
 Instance stops
-
 Instance terminates
-
 Host fails
-
 Instance store volume is unmapped
-
 ❗ Not for Boot Volume
-
 EC2 instance store cannot be used as OS boot disk.
-
 Booting from instance store = slow + unreliable (exam reminder).
 
 4. Limitations
-
 Not available for all EC2 instance types
 (e.g., T2, T3 don’t have instance store)
-
 Capacity is fixed at launch time, cannot resize later.
-
 No snapshots or persistent backup like EBS.
-
 Must handle backup/recovery manually if needed.
 
 5. Block Device Mapping
-
 When launching an instance, you can configure instance store volumes using block device mapping.
-
 Instance store → appears as additional NVMe/SCSI devices.
 
 6. Comparison with EBS
@@ -430,67 +307,54 @@ Best for cache/buffer/scratch
 
 ✅ EC2 Instance Store – MCQs (With Answers + Explanations)
 1. EC2 Instance Store is best described as:
-
 A. Persistent block storage
 B. Temporary block storage attached to the physical server
 C. Object storage for EC2
 D. Network-attached storage
-
 Answer: B
 ✔ Instance Store = ephemeral local block storage physically attached to the host.
 
 2. What happens to data stored on an Instance Store volume when an EC2 instance is stopped?
-
 A. Data persists automatically
 B. Data is moved to S3
 C. Data is lost
 D. Data is snapshot automatically
-
 Answer: C
 ✔ Instance store data is lost on stop/terminate.
 
 3. Which of the following is a good use case for Instance Store?
-
 A. Storing long-term backups
 B. Database storage requiring persistence
 C. Cache or temporary buffer
 D. Storing AMIs
-
 Answer: C
 ✔ Cache/buffer/scratch space = ideal for instance store.
 
 4. Can an EC2 Instance Store volume be resized after instance launch?
-
 A. Yes
 B. No
 C. Only if encrypted
 D. Only with Auto Scaling
-
 Answer: B
 ✔ Capacity is fixed at launch.
 
 5. Which EC2 storage type supports snapshots?
-
 A. Only instance store
 B. Only EBS
 C. Both EBS and instance store
 D. None
-
 Answer: B
 ✔ Only EBS supports snapshots. Instance store does NOT.
 
 6. Does every EC2 instance type come with Instance Store volumes?
-
 A. Yes
 B. No
 C. Yes, but only in shared tenancy
 D. Yes, but only if requested via support
-
-Answer: B
+nswer: B
 ✔ Many instances (e.g., T2/T3) do not have instance store.
 
 7. Instance Store volumes are physically located where?
-
 A. On S3
 B. On EBS servers
 C. On the EC2 instance's host hardware
@@ -500,47 +364,38 @@ Answer: C
 ✔ Instance store is direct-attached hardware storage.
 
 8. Which statement is TRUE about EC2 Instance Store?
-
 A. Data is replicated across AZs
 B. Instance Store can be used as boot volume
 C. Suitable for high-speed temporary data
 D. Data survives instance termination
-
 Answer: C
 ✔ High-speed temporary storage for IO-intensive workloads.
 
 9. If the physical host of EC2 fails, what happens to instance store data?
-
 A. It is backed up automatically
 B. It persists regardless
 C. It is lost
 D. It is moved to EBS
-
 Answer: C
 ✔ Host failure = instance store wiped out.
 
 10. Which is NOT a recommended use case for Instance Store?
-
 A. Temporary data
 B. Hadoop clusters
 C. Container scratch space
 D. Storing critical persistent logs
-
 Answer: D
 ✔ Critical logs require EBS, not ephemeral storage.
 
 11. Instance Store volume capacity:
-
 A. Can be increased anytime
 B. Can be decreased anytime
 C. Is fixed at instance launch
 D. Depends on AMI size
-
 Answer: C
 ✔ Cannot resize instance store.
 
 12. What must you check before planning to use Instance Store?
-
 A. AMI version
 B. Whether instance type supports instance store
 C. Region
@@ -550,31 +405,25 @@ Answer: B
 ✔ Some instance families (like T-series) don’t have instance store.
 
 13. During instance launch, Instance Store volumes are attached through:
-
 A. Elastic network interface mapping
 B. Block device mapping
 C. IAM role mapping
 D. Route tables
-
 Answer: B
 ✔ Block device mapping = where you configure instance store.
 
 14. Which characteristic makes Instance Store high-performance?
-
 A. Integrated with S3
 B. It uses NVMe/SATA drives physically attached
 C. Data replication across hosts
 D. Uses KMS encryption by default
-
 Answer: B
 ✔ Physical NVMe/SATA drives → super low latency.
 
 15. Instance Store is ideal for which scenario?
-
 A. Long-term relational database
 B. File storage requiring durability
 C. Temporary scratch disk for processing
 D. Storing API keys
-
 Answer: C
 ✔ Only for temporary, fast IO workloads.
