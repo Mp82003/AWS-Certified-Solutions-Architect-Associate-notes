@@ -1,0 +1,554 @@
+⭐ 1. What is ELB?
+ELB (Elastic Load Balancing) distributes incoming traffic across multiple targets:
+EC2 instances
+Containers
+IP addresses
+Lambda (ALB only)
+
+Benefits:
+High Availability
+Fault Tolerance
+Automatic scaling
+Health checks
+SSL/TLS termination
+Single point of contact
+
+⭐ 2. How ELB Works (Exam Logic)
+Client request → ELB endpoint
+ELB listener receives request
+ELB performs health checks
+ELB selects healthy target using LB algorithm
+Forwards request → Target group
+Target responds → ELB → Client
+
+⭐ 3. ELB Types (VERY IMPORTANT EXAM TOPIC)
+1️⃣ CLB – Classic Load Balancer (Legacy)
+Layer 4 (TCP/SSL) + Limited L7 (HTTP/HTTPS)
+Very basic
+No advanced routing
+Exam note → NOT important, just know it's legacy.
+
+✔ Use for: Simple TCP or SSL load balancing
+❌ No host/path-based routing
+❌ No modern features (WebSockets, HTTP/2, redirects)
+
+2️⃣ NLB – Network Load Balancer (Layer 4)
+Layer 4 (TCP, UDP, TLS)
+Designed for extreme performance
+Handles millions of requests per second
+Ultra-low latency (microseconds)
+
+Key Features
+Supports Elastic IP (EIP) per AZ
+Ideal for real-time apps
+Static IP support
+Can load balance to:
+EC2
+IPs
+Lambda (via TCP passthrough)
+Algorithms
+Flow hashing
+No path/host-based routing
+
+Exam Trigger Words
+✔ “Millions of requests per second”
+✔ “Static IP needed”
+✔ “TCP/UDP load balancing”
+✔ “Low latency / high throughput”
+👉 Choose NLB
+
+3️⃣ ALB – Application Load Balancer (Layer 7)
+Layer 7 (HTTP/HTTPS)
+Advanced routing
+Best for web applications/microservices
+
+Key Features
+
+Host-based routing (api.example.com → service)
+Path-based routing (/images, /login, /api/*)
+Query/header-based routing
+WebSockets support
+HTTP/2
+Redirects (HTTP → HTTPS)
+Sticky sessions
+Target groups: EC2, IPs, Lambda, containers
+
+Exam Trigger Words
+✔ “Microservices”
+✔ “HTTP headers / URL routing”
+✔ “Content-based routing”
+✔ “Serverless”
+👉 Choose ALB
+
+4️⃣ GWLB – Gateway Load Balancer (Layer 3)
+Layer 3 (IP packet level)
+Used for virtual appliances like:
+Firewalls
+IDS/IPS
+Deep packet inspection
+Security appliances
+
+Key Features
+Combines:
+Load balancer (scaling appliances)
+Gateway (single entry/exit point)
+Integrates with GWLB endpoints (GWLBe)
+
+Exam Trigger Words
+✔ “Security appliances firewall/IDS/IPS”
+✔ “Deep packet inspection”
+✔ “Third-party VNFs”
+👉 Choose GWLB
+
+⭐ 4. Components (Common Across ELBs)
+Load Balancer
+Public or internal
+Handles listener + provides DNS endpoint
+Listeners
+Protocol + port mapping
+
+Examples:
+ALB: HTTP/HTTPS
+NLB: TCP/UDP/TLS
+Target Groups
+Route traffic to:
+EC2
+Lambda
+Containers
+IPs
+Health Checks
+
+ALB → HTTP-based
+NLB → TCP-based
+GWLB → IP-based
+
+⭐ 5. Cross-Zone Load Balancing
+Distributes traffic across all AZ targets, even if request arrives in one AZ.
+Benefits
+Better load distribution
+Higher availability
+Reduced imbalance problems
+Limitations
+Extra data transfer cost (for NLB if enabled)
+More complex architecture
+Important Exam Notes
+LB Type	Default	Configurable
+ALB	ON	Cannot disable
+NLB	OFF	Enable manually
+CLB	ON	Can disable
+⭐ 6. ELB Exam Cheat Sheet
+Scenario	                                Correct Load Balancer
+Content-based routing                      	    ALB
+API Gateway alternative (simple HTTP LB)	     ALB
+Millions of req/sec                          	NLB
+WebSockets                                  	ALB
+Static IP required                            NLB
+TCP/UDP traffic	                              NLB
+Lambda as backend	                            ALB
+Firewall / IDS appliance	                    GWLB
+Deep packet inspection                       	GWLB
+Legacy apps	                                  CLB
+
+
+1. Which ELB operates at Layer 7 of the OSI model?
+
+A. NLB
+B. CLB
+C. ALB
+D. GWLB
+
+✔ Answer: C. ALB
+Explanation: ALB is an application layer (Layer 7) load balancer.
+
+2. Which ELB supports content-based routing?
+
+A. NLB
+B. ALB
+C. CLB
+D. GWLB
+
+✔ Answer: B. ALB
+Explanation: Only ALB can route based on URL path, host, headers.
+
+3. Which ELB is best for real-time TCP applications needing extremely low latency?
+
+A. CLB
+B. ALB
+C. NLB
+D. GWLB
+
+✔ Answer: C. NLB
+Explanation: NLB is designed for ultra-low latency and TCP/UDP loads.
+
+4. Which ELB supports static IP addresses?
+
+A. ALB
+B. NLB
+C. CLB
+D. GWLB
+
+✔ Answer: B. NLB
+Explanation: NLB provides one Elastic IP per AZ.
+
+5. Which ELB is used for third-party firewall appliances?
+
+A. CLB
+B. ALB
+C. NLB
+D. GWLB
+
+✔ Answer: D. GWLB
+Explanation: GWLB integrates with virtual appliances like firewalls, IDS/IPS.
+
+6. Which ELB can route requests to AWS Lambda?
+
+A. CLB
+B. NLB
+C. ALB
+D. GWLB
+
+✔ Answer: C. ALB
+Explanation: ALB supports Lambda targets.
+
+7. Classic Load Balancer is primarily used for:
+
+A. Path-based routing
+B. Simple TCP/SSL load balancing
+C. WebSockets
+D. Streaming
+
+✔ Answer: B. Simple TCP/SSL load balancing
+Explanation: CLB is legacy and supports basic Layer 4/7.
+
+8. Which ELB supports millions of requests per second?
+
+A. GWLB
+B. ALB
+C. NLB
+D. CLB
+
+✔ Answer: C. NLB
+Explanation: NLB is built for extreme performance.
+
+9. Which load balancer supports WebSocket connections?
+
+A. CLB
+B. NLB
+C. ALB
+D. GWLB
+
+✔ Answer: C. ALB
+Explanation: ALB supports WebSockets and HTTP/2.
+
+10. Which ELB distributes traffic at a packet level (Layer 3)?
+
+A. ALB
+B. NLB
+C. GWLB
+D. CLB
+
+✔ Answer: C. GWLB
+Explanation: GWLB works at Layer 3 for IP packet inspection.
+
+✅ PART 2 — MEDIUM (SCENARIO MCQs)
+11. Your application needs to route traffic to microservices based on URL paths. Which ELB do you choose?
+
+A. CLB
+B. ALB
+C. NLB
+D. GWLB
+
+✔ Answer: B. ALB
+Explanation: Path-based routing = ALB.
+
+12. A financial app needs fixed IP addresses and TLS offloading. Best option?
+
+A. ALB
+B. NLB
+C. CLB
+D. GWLB
+
+✔ Answer: B. NLB
+Explanation: Only NLB supports static IPs and TLS listeners.
+
+13. You need the lowest latency possible for VoIP traffic. Which ELB?
+
+A. ALB
+B. NLB
+C. GWLB
+D. CLB
+
+✔ Answer: B. NLB
+Explanation: NLB supports UDP and low-latency communication.
+
+14. You want to perform deep packet inspection before packets reach EC2.
+
+A. ALB
+B. NLB
+C. CLB
+D. GWLB
+
+✔ Answer: D. GWLB
+Explanation: GWLB integrates with security appliances.
+
+15. Which ELB uses flow hashing algorithm by default?
+
+A. ALB
+B. NLB
+C. CLB
+D. GWLB
+
+✔ Answer: B. NLB
+Explanation: NLB uses flow hash for TCP/UDP connections.
+
+16. For an Auto Scaling group behind ALB, what must be used?
+
+A. Security groups
+B. Target groups
+C. VPC endpoints
+D. EIPs
+
+✔ Answer: B. Target groups
+Explanation: ALB forwards to target groups.
+
+17. Cross-zone Load Balancing for NLB is:
+
+A. On by default
+B. Off by default
+C. Not supported
+D. Always required
+
+✔ Answer: B. Off by default
+Explanation: You must manually enable it.
+
+18. ALB health checks operate at which layer?
+
+A. Layer 3
+B. Layer 4
+C. Layer 7
+D. Layer 2
+
+✔ Answer: C. Layer 7
+Explanation: ALB uses HTTP/HTTPS health checks.
+
+19. Which ELB supports IP-based target registration?
+
+A. ALB
+B. NLB
+C. CLB
+D. Both A and B
+
+✔ Answer: D. Both A and B
+Explanation: ALB and NLB can route to IPs.
+
+20. You need sticky sessions for a stateful web app. Which ELB supports it?
+
+A. ALB
+B. NLB
+C. GWLB
+D. None
+
+✔ Answer: A. ALB
+Explanation: ALB supports session stickiness cookies.
+
+✅ PART 3 — HARD / EXAM-LEVEL SCENARIOS
+21. A gaming backend requires UDP and must scale to millions of connections. Choose the best ELB:
+
+A. ALB
+B. NLB
+C. CLB
+D. GWLB
+
+✔ Answer: B. NLB
+Explanation: UDP + high scale = NLB.
+
+22. A multi-AZ app uses ALB and wants even traffic across AZs. What setting?
+
+A. HTTP/2
+B. Cross-zone load balancing
+C. Pre-warming
+D. Sticky sessions
+
+✔ Answer: B. Cross-zone load balancing
+Explanation: ALB has it enabled by default.
+
+23. Which ELB is best for transparent network appliances?
+
+A. CLB
+B. NLB
+C. GWLB
+D. ALB
+
+✔ Answer: C. GWLB
+Explanation: Used for virtual security appliances.
+
+24. A company wants to terminate SSL at the load balancer and forward plain HTTP internally. Which ELB supports SSL offloading?
+
+A. NLB
+B. ALB
+C. CLB
+D. All
+
+✔ Answer: D. All
+Explanation: All ELBs can use HTTPS → HTTP termination.
+
+25. You need to route /api/* to one service and /app/* to another. What do you configure?
+
+A. NLB listeners
+B. ALB path-based rules
+C. CLB listeners
+D. GWLB endpoints
+
+✔ Answer: B. Path-based rules
+Explanation: Only ALB supports routing rules.
+
+26. Health checks must test a JSON API endpoint /health. Which LB supports this?
+
+A. NLB
+B. CLB
+C. ALB
+D. GWLB
+
+✔ Answer: C. ALB
+Explanation: ALB supports L7 health checks with specific paths.
+
+27. Which ELB should you choose for end-to-end encryption where LB must not decrypt?
+
+A. ALB
+B. NLB (TLS passthrough)
+C. CLB (HTTP listener)
+D. GWLB
+
+✔ Answer: B. NLB
+Explanation: NLB supports TLS passthrough.
+
+28. You require fixed IP addresses for incoming traffic. Choose:
+
+A. ALB
+B. NLB
+C. CLB
+D. GWLB
+
+✔ Answer: B. NLB
+Explanation: NLB provides static IPs/EIPs.
+
+29. Which ELB supports Lambda targets?
+
+A. ALB
+B. NLB
+C. CLB
+D. GWLB
+
+✔ Answer: A. ALB
+Explanation: ALB supports serverless routing.
+
+30. A customer's appliance requires traffic mirroring for security. Which LB integrates best?
+
+A. ALB
+B. GWLB
+C. NLB
+D. CLB
+
+✔ Answer: B. GWLB
+Explanation: GWLB is designed for monitoring & inspection.
+
+✅ PART 4 — VERY HARD / TRICKY (Real AWS Exam Style)
+31. Company requires IPv4 and IPv6 load balancing at Layer 7. Which ELB?
+
+A. CLB
+B. ALB
+C. NLB
+D. GWLB
+
+✔ Answer: B. ALB
+Explanation: ALB fully supports dual-stack + L7 routing.
+
+32. NLB with cross-zone disabled receives 1000 requests in AZ-A but backend instances exist equally in A and B. Where will traffic go?
+
+A. All to AZ-A instances
+B. Split equally across A and B
+C. All to AZ-B
+D. Randomly distributed
+
+✔ Answer: A. All to AZ-A instances
+Explanation: Without cross-zone LB, NLB routes within the AZ.
+
+33. GWLB endpoints are created using which AWS service?
+
+A. S3
+B. VPC Endpoint Service
+C. Route 53
+D. IAM
+
+✔ Answer: B. VPC Endpoint Service
+Explanation: GWLBe is built using VPC endpoint service.
+
+34. An app requires HTTP/2 for clients. Which ELB supports it?
+
+A. ALB only
+B. NLB only
+C. CLB only
+D. GWLB
+
+✔ Answer: A. ALB only
+Explanation: ALB supports HTTP/2 on front end.
+
+35. You need to redirect HTTP → HTTPS automatically. Which ELB supports redirection rules?
+
+A. ALB
+B. NLB
+C. CLB
+D. GWLB
+
+✔ Answer: A. ALB
+Explanation: ALB supports redirect actions.
+
+36. Which LB is recommended for microservices running in ECS (Fargate)?
+
+A. CLB
+B. ALB
+C. NLB
+D. GWLB
+
+✔ Answer: B. ALB
+Explanation: ALB integrates tightly with ECS target groups.
+
+37. A compliance requirement prevents decrypting traffic. What is the correct LB setup?
+
+A. ALB with HTTPS listeners
+B. NLB with TLS passthrough
+C. CLB with sticky sessions
+D. GWLB
+
+✔ Answer: B. NLB with TLS passthrough
+Explanation: NLB forwards encrypted traffic directly to targets.
+
+38. Your backend needs the client’s original IP. Which LB works best?
+
+A. ALB
+B. NLB
+C. CLB
+D. None
+
+✔ Answer: B. NLB
+Explanation: NLB preserves the client source IP automatically.
+
+39. For ALB, how do you enable even distribution across all AZs?
+
+A. Enable proxy protocol
+B. It is enabled by default
+C. Enable NLB routing
+D. Change health check protocol
+
+✔ Answer: B. Enabled by default
+Explanation: ALB has cross-zone LB turned ON.
+
+40. Which LB allows you to scale security appliances automatically?
+
+A. ALB
+B. NLB
+C. CLB
+D. GWLB
+
+✔ Answer: D. GWLB
+Explanation: GWLB elastically scales virtual appliances.
