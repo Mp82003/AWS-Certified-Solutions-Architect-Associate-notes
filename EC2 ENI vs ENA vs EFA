@@ -1,0 +1,228 @@
+1. An application running on EC2 needs basic networking, multiple IPs, and security groups. No high-bandwidth requirement. Which option should be used?
+
+A. ENI
+B. ENA
+C. EFA
+D. VPN Interface
+
+✔ Correct Answer: A. ENI
+Explanation: ENI is the basic virtual NIC for standard workloads.
+
+2. A solution architect needs high throughput and low latency networking for inter-instance communication. Which NIC is MOST suitable?
+
+A. ENI
+B. ENA
+C. EFA
+D. NAT instance
+
+✔ Correct Answer: B. ENA
+Explanation: ENA supports high-performance networking up to 100 Gbps.
+
+3. A machine learning workload requires extremely low-latency communication and OS bypass. Which AWS NIC should you choose?
+
+A. Secondary ENI
+B. ENA
+C. EFA
+D. ClassicLink
+
+✔ Correct Answer: C. EFA
+Explanation: Only EFA provides OS-bypass and HPC-level low latency.
+
+4. Which feature is supported ONLY by EFA and not by ENI or ENA?
+
+A. Security groups
+B. OS bypass
+C. Multiple private IPs
+D. IPv6 addresses
+
+✔ Correct Answer: B. OS bypass
+Explanation: OS bypass is unique to EFA for HPC workloads.
+
+5. In OS bypass mode, EFA traffic is restricted to:
+
+A. Multiple VPCs
+B. Multiple subnets
+C. Same subnet only
+D. Across Availability Zones
+
+✔ Correct Answer: C. Same subnet only
+Explanation: EFA in OS bypass mode cannot route traffic outside a single subnet.
+
+6. Which network interface is available on all EC2 instance types?
+
+A. ENI
+B. ENA
+C. EFA
+D. Intel VF Adapter
+
+✔ Correct Answer: A. ENI
+Explanation: ENI is supported on every instance type; ENA/EFA have restrictions.
+
+7. A workload requires up to 100 Gbps network speed. Which NIC supports this?
+
+A. ENI
+B. ENA
+C. EFA only
+D. None
+
+✔ Correct Answer: B. ENA
+Explanation: ENA supports up to 100 Gbps networking.
+
+8. A parallel scientific simulation using MPI needs the lowest latency possible. Best NIC?
+
+A. ENI
+B. ENA
+C. EFA
+D. Secondary Private IP
+
+✔ Correct Answer: C. EFA
+Explanation: MPI-based workloads are tightly coupled → EFA is designed for this.
+
+9. What happens when using EFA in non–OS-bypass mode?
+
+A. Traffic cannot be routed
+B. Traffic can be routed across subnets
+C. EFA is disabled
+D. Only IPv6 works
+
+✔ Correct Answer: B. Traffic can be routed across subnets
+Explanation: Routing limits apply ONLY in OS-bypass mode.
+
+10. You need a NIC supporting SR-IOV for high I/O performance and low CPU usage. Which one?
+
+A. ENI
+B. ENA
+C. EFA
+D. Internet Gateway
+
+✔ Correct Answer: B. ENA
+Explanation: ENA uses SR-IOV for enhanced performance.
+
+
+1️⃣ ENI – Elastic Network Interface (Basic NIC)
+
+Use case: General-purpose networking (web servers, app servers, DB servers).
+Supported on: ALL EC2 instance types.
+
+Key Features (MUST remember):
+
+Primary private IPv4 address
+
+Multiple secondary IPv4 addresses
+
+1 Elastic IP per private IPv4
+
+IPv6 support
+
+One or more security groups
+
+MAC address
+
+Attach/detach between instances in the same AZ
+
+When to choose ENI (Exam Clue):
+
+No high-performance requirements
+
+Basic VPC networking
+
+Regular workloads
+
+2️⃣ ENA – Elastic Network Adapter (High Performance NIC)
+
+Use case: High throughput + low latency networking.
+Supported on: Selected EC2 instance families (HVM only).
+
+Key Features:
+
+Uses SR-IOV (Single Root I/O Virtualization)
+
+High performance:
+
+Up to 100 Gbps network speed
+
+Higher PPS (Packets per second)
+
+Lower CPU utilization
+
+Exam Clue (VERY IMPORTANT):
+
+If the question asks:
+✔ "High bandwidth?"
+✔ "Low instance-to-instance latency?"
+✔ "Need high PPS?"
+👉 Choose ENA over ENI.
+
+3️⃣ EFA – Elastic Fabric Adapter (Specialized HPC NIC)
+
+Use case:
+
+HPC (High Performance Computing)
+
+Machine Learning
+
+Tightly coupled cluster workloads (parallel computing)
+
+Key Features:
+
+Builds on ENA, but adds:
+✔ OS-bypass feature
+✔ Direct communication between application & NIC hardware
+✔ Ultra-low latency
+
+Comparable performance to on-prem HPC clusters
+
+Two Modes of Operation:
+A) OS bypass mode (Very important exam point):
+
+SUPER low latency
+
+Traffic cannot be routed
+
+Must stay within a single subnet
+
+For tightly-coupled HPC tasks
+(MPI-based workloads like CFD, weather modeling, seismic processing, ML training)
+
+B) Non–OS bypass mode:
+
+Works like ENA
+
+Traffic IS routable across subnets
+
+Exam Clue:
+
+If the question involves:
+✔ MPI workloads
+✔ HPC cluster
+✔ ML training with ultra-fast communication
+✔ Need direct NIC access
+👉 Choose EFA.
+
+🔥 Differences Summary Table (Exam Speed Revision)
+Feature	                            ENI	                       ENA	                                    EFA
+Performance	                     Basic	                       High	                                 Ultra-high
+Use case        	          General workloads        High network throughput, low latency	          HPC, ML, tightly coupled apps
+OS bypass                     	❌ No	                   ❌ No                                        	✔ Yes
+Subnet routing               	✔ Yes                   	✔ Yes	                                      ❌ No (OS bypass mode)
+Instance support               	All types	          Limited                                           	Limited
+Max speed	Low/Standard	Up to 100 Gbps	Highest available
+📌 Most Important Exam Triggers
+✔ "High-performance networking" → ENA
+✔ "HPC / MPI / tightly coupled apps" → EFA
+✔ "Basic networking" → ENI
+✔ "OS bypass" → Only EFA
+✔ "Traffic cannot be routed / must stay within same subnet" → EFA in OS bypass mode
+✔ "Supported on all instance types" → Only ENI
+🧠 Short Mnemonics (For Exam Memory)
+💡 ENI = Normal
+
+Basic NIC → Normal workloads.
+
+💡 ENA = Accelerated
+
+High performance → "Accelerated Networking".
+
+💡 EFA = Fastest
+
+HPC → "Fabric" = Super-fast communication fabric.
