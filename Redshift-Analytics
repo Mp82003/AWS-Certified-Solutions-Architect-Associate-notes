@@ -3,10 +3,7 @@
 ## Overview
 **Amazon Redshift** is a fully managed, petabyte-scale data warehouse service designed for fast querying and analysis of large datasets using SQL queries.
 
----
-
 ## Key Characteristics
-
 ### Core Features
 - **Fully Managed Service**: AWS handles maintenance, backups, and scaling
 - **Petabyte Scale**: Can handle massive amounts of data
@@ -14,10 +11,7 @@
 - **Highly Scalable**: Easily scale data warehouse as data grows
 - **Based on PostgreSQL**: Compatible with most SQL client applications with minimal code changes
 
----
-
 ## Architecture Components
-
 ### 1. Client Applications
 Integration with various tools:
 - **ETL Tools** (Extract, Transform, Load)
