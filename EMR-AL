@@ -1,0 +1,274 @@
+
+🏛 Amazon EMR Architecture – 4 Layers (Story Style)
+1️⃣ Storage Layer – Jahaan saara data rakha hai
+Like restaurant ka fridge + freezer + store room.
+Contains:
+HDFS → Local distributed storage
+EMRFS → S3 ko HDFS jaise treat karta
+Local FS → Instance ke andar ka disk
+EMRFS = S3 ka “magic bridge”
+
+2️⃣ Cluster Resource Management – Kitchen Manager 👨‍🍳
+Handles:
+YARN → Allocates resources (“yeh chef idli banayega, yeh dosa”)
+Agent → Node monitoring (“sab theek? koi jal gaya?”)
+
+3️⃣ Data Processing Layer – Chef who cooks data
+Hadoop MapReduce → Old chef (slow but reliable)
+Apache Spark → Modern chef (10x faster)
+
+4️⃣ Application Layer – Final Dishes
+Spark SQL
+MLlib
+Streaming apps
+Hive, Pig
+Ye sab final “business dishes” prepare karte hain.
+
+🧩 Cluster Components – 3 Types of Nodes
+1️⃣ Primary Node (Master) — Head Chef
+Coordinates cluster
+Assigns tasks
+Monitors health
+Tracks results
+→ Every cluster needs 1 Primary
+
+2️⃣ Core Node — Assistant Chefs
+Process + Store data
+Part of HDFS
+→ Without them data store nahi hoga
+
+3️⃣ Task Node — Temporary Interns
+Only process data
+Storage nahi hota
+Anytime add/remove (scaling)
+
+🚀 EMR Working – Simple Steps
+You submit job → Spark / Hadoop
+EMR reads input from S3 / HDFS
+EMR processes using Spark
+Output again stored in S3
+Everything auto magical ✨
+
+💰 EMR Benefits – Exam Style
+✔ Cheap
+Pay for EC2 instances
+Spot instances = 70–90% cheaper
+
+✔ Fast
+Spark distributed processing
+Optimized Hadoop
+
+✔ Secure
+IAM
+Security Groups
+Kerberos
+Encryption
+
+✔ Scalable
+Add/remove Task nodes on demand
+
+✔ Fully Managed
+Cluster provisioning
+Auto-recovery
+Monitoring with CloudWatch
+
+🧠 Hands-On Flow (Exam Oriented)
+1️⃣ Create key pair
+For SSH into cluster (optional in real exams).
+
+2️⃣ Create S3 bucket
+Store:
+Input data
+Application file
+Logs
+
+3️⃣ Upload files
+run.py
+food_establishment_data.csv
+
+4️⃣ Launch EMR Cluster
+Important exam settings:
+EMR Release → latest
+Apps → Spark (most common exam focus)
+Instance type → m5.xlarge
+Primary + Core + Task
+Logs location → S3-bucket/logs
+Key pair → required if SSH
+
+5️⃣ Add Step
+Type → Spark Application
+Arguments → Input + Output S3 paths
+Monitoring status → Pending → Running → Completed
+
+6️⃣ Check Output
+Go to S3 → results folder → CSV output.
+
+7️⃣ SSH into Master
+Used for accessing logs:
+chmod 400 emr.pem
+aws emr ssh --cluster-id j-xxxxx --key-pair-file emr.pem
+cd /mnt/var/log/spark
+
+8️⃣ Cleanup
+Terminate cluster
+Delete S3 bucket
+Remove logs
+
+🎯 AWS Exam-Oriented Summary (Super Short for Revision)
+
+EMR = Managed Hadoop/Spark
+Stores data in HDFS + EMRFS (S3)
+Cluster = Primary + Core + Task
+Steps = Work units
+Spark = Fastest processing
+EMRFS = read/write S3 data
+
+
+                                                                                    ┌───────────────────────┐
+                        │      AMAZON EMR       │
+                        │  (Elastic MapReduce)  │
+                        └──────────┬────────────┘
+                                   │
+                 ┌─────────────────┼─────────────────┐
+                 │                 │                 │
+         ┌───────┴───────┐ ┌──────┴───────┐ ┌───────┴────────┐
+         │   Architecture │ │   Components  │ │     Benefits   │
+         └───────┬───────┘ └──────┬────────┘ └────────┬───────┘
+                 │                 │                   │
+     ┌───────────┼───────────┐    │        ┌──────────┼───────────┐
+     │           │           │    │        │          │           │
+┌────┴───┐  ┌────┴───┐  ┌────┴───┐│  ┌─────┴────┐ ┌───┴────┐ ┌────┴────┐
+│Storage │  │Resource│  │Processing│  │ Primary   │ │ Core   │ │ Task    │
+│ Layer  │  │Manager │  │ Framework│  │ Node      │ │ Node   │ │ Node    │
+└────┬───┘  └────┬───┘  └────┬───┘  └────┬──────┘ └────┬────┘ └────┬────┘
+     │           │           │           │              │           │
+  ┌──┼──┐   ┌────┼────┐   ┌──┼───┐  Coordinates   Stores +     Only
+  │HDFS│   │ YARN    │   │Spark│   jobs/tasks     Processes     Compute
+  └────┘   └─────────┘   └──────┘   Monitoring      Data        No HDFS
+  ┌──────┐ ┌─────────┐   ┌────────┐
+  │EMRFS │ │ Agent   │   │MapReduce│
+  └──────┘ └─────────┘   └────────┘
+  (S3 Access)
+
+
+Cheap with Spot nodes
+
+Logs in S3
+
+Used for: Big Data Analytics, ETL, ML
+
+
+MCQs
+
+EMR is mainly used for?
+A) Web hosting
+B) Big Data processing
+C) Serverless APIs
+Ans: B
+
+EMRFS is used for?
+A) Access S3 like HDFS
+B) Snapshot EC2
+C) Encrypt logs
+Ans: A
+
+Which node stores data?
+A) Task
+B) Core
+C) Primary
+Ans: B
+
+Master node in EMR is?
+A) Task
+B) Primary
+C) Root
+Ans: B
+
+Which node is optional?
+A) Primary
+B) Core
+C) Task
+Ans: C
+
+Spark runs on which layer?
+A) Storage
+B) Data processing
+C) Management
+Ans: B
+
+EMR stores logs in?
+A) S3
+B) Lambda
+C) DynamoDB
+Ans: A
+
+Cheapest instance type for EMR?
+A) On-demand
+B) Reserved
+C) Spot
+Ans: C
+
+S3 read/write in EMR is done via?
+A) HDFS
+B) EMRFS
+C) EBS
+Ans: B
+
+Task nodes can be?
+A) Auto-scaled
+B) Deleted only
+C) Not removed
+Ans: A
+
+Step failure with CONTINUE option?
+A) Cluster stops
+B) Cluster keeps running
+Ans: B
+
+SSH needed for?
+A) Run Spark UI
+B) Debug logs
+C) Both
+Ans: C
+
+EMR cluster by default creates?
+A) 1 EC2 instance
+B) Multiple nodes
+Ans: B
+
+EMR used in pipeline for?
+A) ML training
+B) ETL
+C) Both
+Ans: C
+
+EMR primary node runs?
+A) Storage
+B) Resource manager
+C) Both
+Ans: C
+
+EMR input usually stored in?
+A) S3
+B) Lambda
+Ans: A
+
+EMRFS consistency model?
+A) Eventual
+B) Strong
+Ans: A
+
+EMR cluster termination removes?
+A) S3 data
+B) EC2 instances
+Ans: B
+
+Default resource manager for EMR?
+A) YARN
+B) Mesos
+Ans: A
+
+Best for petabyte-scale processing?
+A) Lambda
+B) EMR
+Ans: B
