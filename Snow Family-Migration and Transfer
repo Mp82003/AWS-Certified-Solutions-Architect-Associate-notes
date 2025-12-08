@@ -1,0 +1,452 @@
+1️⃣ What is AWS Snow Family?
+AWS Snow Family = Set of offline, rugged physical devices used to migrate large datasets into or out of AWS when:
+Internet is slow, unreliable, or non-existent
+Environment is remote / edge / non-data center
+Need local compute + storage for edge processing
+
+Members:
+AWS Snowcone – smallest, portable
+AWS Snowball – mid-size (Edge Storage / Edge Compute)
+AWS Snowmobile – 45-foot shipping container for exabytes
+
+Used to:
+Move TB → PB → EB of data
+Run edge computing workloads (IoT, ML inference, preprocessing)
+Deploy local EC2 + IoT Greengrass
+
+2️⃣ Standard Features of AWS Snow Family
+✔ 1. Encryption (Automatic + Strong)
+All data is encrypted with AES-256.
+
+Keys managed by AWS KMS.
+Keys never stored on device → secure even if stolen.
+
+Exam Tip:
+"If a Snow device is lost or stolen during transit, is customer data safe?"
+YES → encryption + TPM + auto wipe.
+
+✔ 2. On-board Computing
+Devices can run:
+EC2 instances
+AWS IoT Greengrass
+Local data filtering, preprocessing & compression
+
+Useful for:
+Remote locations (ships, oil rigs)
+Military field data
+Factory edge ML
+
+✔ 3. End-to-End Tracking
+E-ink shipping label (auto updates)
+SNS notifications
+Track using AWS Console
+
+✔ 4. Anti-Tamper / Tamper Evident
+Trusted Platform Module (TPM)
+Hardware root of trust
+Device re-initialized after each use
+
+✔ 5. NFS Endpoint
+Snow devices support:
+NFS v3 & v4.1
+
+Use case:
+Mount device like a normal file share
+Copy data from on-prem servers easily
+
+✔ 6. Simple Management (AWS OpsHub GUI)
+AWS OpsHub helps you:
+Unlock / configure device
+Launch EC2 instances on the device
+Transfer files
+Monitor data migration
+
+✔ 7. Secure Erasure (NIST Wipe)
+After migration:
+AWS performs software erasure
+Follows NIST 800-88 media sanitization standard
+
+Ensures:
+No customer data remains on device
+
+3️⃣ Snow Family Members (Deep Dive)
+🟦 1. AWS Snowcone
+Smallest device
+Portable, works on battery or AC
+Sensors, drones, vehicles, remote sensors
+Specs:
+8 TB storage
+2 vCPU + 4 GB RAM (Edge compute version)
+
+Use Cases:
+Disaster zones
+Remote IoT data capture
+Drone video offloading
+
+🟩 2. AWS Snowball (Edge Storage / Edge Compute)
+Two types:
+Snowball Edge Storage Optimized
+80 TB usable storage
+Ideal for large migrations
+Snowball Edge Compute Optimized
+More CPU, GPU options
+Run ML inference, analytics
+
+Use Cases:
+Migrate hundreds of TB
+Local compute in remote locations
+Build local mini-cloud environments
+
+🟥 3. AWS Snowmobile
+Literally a truck (45-foot container)
+Moves up to 100 PB per Snowmobile
+Designed for exabyte-scale migrations
+Use Case:
+Data center exit
+Media archives
+Government / satellite imagery
+
+4️⃣ Example Story to Remember Easily
+💡 Imagine you run an exploration team in the Himalayas…
+The team needs to store data with no internet → Snowcone
+Base camp wants to run ML inferencing locally → Snowball Compute Optimized
+After expedition ends, the company must migrate 10 PB archive → Snowmobile
+
+5️⃣ Important Points for Exam
+Topic	Exam-Level Knowledge
+Encryption	AES-256, KMS managed, no keys on device
+Data loss risk	Safe → device is encrypted + TPM
+Migration size	TB → Snowcone, 80TB+ → Snowball, 100PB+ → Snowmobile
+Compute support	EC2 + Greengrass on Snowcone/Snowball
+Tracking	E-ink label + SNS
+Sanitization	NIST-800-88 wipe
+
+Typical Question:
+Which Snow device to choose when migrating 50 PB of data?
+👉 Snowmobile
+
+6️⃣ Quick Summary (for last-minute revision)
+Snow Family = offline physical devices for data migration + edge compute
+Members: Snowcone, Snowball, Snowmobile
+Features: AES-256 encryption, TPM security, NFS support, OpsHub GUI, NIST wipe
+Snowcone = portable small data collection
+Snowball = medium data + edge compute
+Snowmobile = exabyte-scale migration
+
+AWS Snow Family – MCQs (35 Questions)
+📘 MCQ SET – 1 (Basics)
+1. Which of the following is NOT a member of the AWS Snow Family?
+
+A. Snowcone
+B. Snowball
+C. Snowmobile
+D. Snowcluster
+
+✅ Answer: D
+Explanation: Snowcluster doesn’t exist.
+
+2. Snow Family devices are primarily used for:
+
+A. Real-time video streaming
+B. Large-scale offline data migration
+C. Hosting large databases on AWS
+D. Multi-region replication
+
+✅ Answer: B
+
+3. Which AWS service manages encryption keys for Snow devices?
+
+A. AWS Secrets Manager
+B. AWS KMS
+C. IAM
+D. AWS Certificate Manager
+
+✅ Answer: B
+Explanation: AES-256 keys managed by KMS.
+
+4. Snow devices encrypt your data using which algorithm?
+
+A. AES-128
+B. SHA-256
+C. AES-256
+D. DES
+
+✅ Answer: C
+
+5. How are Snow devices tracked during shipping?
+
+A. QR code
+B. Bluetooth tags
+C. E-ink shipping label + SNS notifications
+D. Email alerts only
+
+✅ Answer: C
+
+📗 MCQ SET – 2 (Snowcone)
+6. AWS Snowcone is best suited for:
+
+A. Exabyte-scale migration
+B. Data center migration
+C. Edge data collection in remote locations
+D. Cloud-native ML processing
+
+✅ Answer: C
+
+7. Snowcone supports how much usable storage?
+
+A. 4 TB
+B. 8 TB
+C. 50 TB
+D. 80 TB
+
+✅ Answer: B
+
+8. Snowcone can run:
+
+A. Only S3 storage
+B. EC2 instances + IoT Greengrass
+C. RDS databases
+D. Redshift clusters
+
+✅ Answer: B
+
+9. Snowcone is powered by:
+
+A. Only AC
+B. Solar energy
+C. Battery or AC
+D. Only DC
+
+✅ Answer: C
+
+📘 MCQ SET – 3 (Snowball)
+10. Which Snowball device provides GPU support?
+
+A. Snowball Storage Optimized
+B. Snowball Compute Optimized
+C. Snowcone Compute
+D. Snowmobile GPU edition
+
+✅ Answer: B
+
+11. Snowball Edge Storage Optimized has approximately:
+
+A. 8 TB
+B. 40 TB
+C. 80 TB
+D. 1 PB
+
+✅ Answer: C
+
+12. Snowball is ideal for:
+
+A. Migrating 10 GB of data
+B. Running Kubernetes clusters
+C. Migrating 200 TB of logs
+D. Running high-performance DynamoDB
+
+✅ Answer: C
+
+13. Snowball Edge devices support which protocols?
+
+A. SMB only
+B. NFS v3 & v4.1
+C. iSCSI
+D. SFTP only
+
+✅ Answer: B
+
+14. You want to process ML inference at the edge. Which device will you choose?
+
+A. Snowcone
+B. Snowball Edge Compute Optimized
+C. Snowmobile
+D. EC2 only
+
+✅ Answer: B
+
+📙 MCQ SET – 4 (Snowmobile)
+15. Snowmobile is used to move:
+
+A. MB of logs
+B. TB of archive data
+C. PB–EB scale data
+D. Small IoT data
+
+✅ Answer: C
+
+16. How much data can one Snowmobile carry?
+
+A. 80 TB
+B. 200 TB
+C. 1 PB
+D. Up to 100 PB
+
+✅ Answer: D
+
+17. Snowmobile is physically transported as:
+
+A. Laptop-sized device
+B. AWS truck container
+C. Portable hard drive
+D. Ship cargo
+
+✅ Answer: B
+
+18. Typical customer for Snowmobile:
+
+A. A college startup
+B. A small company migrating 1 TB
+C. A government agency with 50 PB data
+D. A mobile app developer
+
+✅ Answer: C
+
+📕 MCQ SET – 5 (Security & Features)
+19. Which hardware security module protects Snow devices from tampering?
+
+A. HSM
+B. TPM
+C. KMS box
+D. IAM shield
+
+✅ Answer: B
+Trusted Platform Module.
+
+20. What happens after a Snow job completes?
+
+A. Data remains on the device
+B. AWS performs NIST-compliant sanitization
+C. Device becomes unusable
+D. User must wipe the device manually
+
+✅ Answer: B
+
+21. Are encryption keys stored on the Snow device?
+
+A. Yes
+B. No
+C. Sometimes
+D. Only for Snowmobile
+
+✅ Answer: B
+
+22. What tool is used to manage Snow devices?
+
+A. CloudWatch
+B. OpsHub
+C. Redshift Manager
+D. Storage Gateway
+
+✅ Answer: B
+
+23. Snow devices support running:
+
+A. Redshift Spectrum
+B. EC2 instances
+C. Aurora Clusters
+D. S3 Glacier Vaults
+
+✅ Answer: B
+
+📘 MCQ SET – 6 (Exam-Level Scenarios)
+24. Your company wants to migrate 600 TB of data with spotty internet. Best option?
+
+A. Direct Connect
+B. Snowball
+C. Snowcone
+D. Storage Gateway
+
+✅ Answer: B
+
+25. You need to migrate 80 PB from a data center. Choose the best service:
+
+A. Snowball
+B. S3 Transfer Acceleration
+C. Snowmobile
+D. Kinesis Data Firehose
+
+✅ Answer: C
+
+26. Which device supports both compute & storage at edge?
+
+A. Snowball Edge
+B. Snowmobile
+C. CloudFront
+D. Glacier Edge
+
+✅ Answer: A
+
+27. An oil rig with no internet must run EC2 locally. Choose device:
+
+A. Snowcone
+B. Snowball Edge Compute Optimized
+C. Snowmobile
+D. EBS Snapshot
+
+✅ Answer: B
+
+28. You want to pre-process data at edge before sending to AWS. Which feature helps?
+
+A. Greengrass
+B. CloudTrail
+C. Route 53
+D. SQS
+
+✅ Answer: A
+
+29. Which protocol can be used to write data to Snow devices?
+
+A. NFS
+B. SMB
+C. Fibre Channel
+D. HTTP only
+
+✅ Answer: A
+
+30. Snowball devices use which connection model to transfer data?
+
+A. Always online
+B. Offline physical shipping
+C. VPN-only
+D. Global Accelerator-only
+
+✅ Answer: B
+
+📗 MCQ SET – 7 (Trick Questions)
+31. Snow devices can act as temporary storage when internet is unavailable.
+
+True / False?
+
+✅ Answer: True
+
+32. Snowmobile can process data like EC2 instances.
+
+True / False?
+
+✅ Answer: False
+Snowmobile = storage only, not compute.
+
+33. OpsHub must be used from the AWS Console.
+
+A. True
+B. False
+
+✅ Answer: B
+OpsHub is local desktop GUI, not a console-only tool.
+
+34. Removing the TPM chip exposes customer data.
+
+A. True
+B. False
+
+✅ Answer: B
+Data is encrypted with AES-256; TPM only enforces tamper detection.
+
+35. Snowcone is heavier and higher capacity than Snowball.
+
+A. True
+B. False
+
+✅ Answer: B
+Snowcone < Snowball in size & capacity.
