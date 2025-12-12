@@ -1,0 +1,428 @@
+🚀 1. What Are Step Functions?
+AWS Step Functions is a serverless orchestration service that lets you combine Lambda + other AWS services into workflows called state machines.
+Think of Step Functions = AWS ka “workflow brain”
+It tells AWS services what to do → in what order → with what conditions.
+
+🧩 2. Core Components
+State Machine
+A workflow made of multiple steps.
+Defined using Amazon States Language (ASL) — JSON-based.
+Execution
+Each run of the workflow = Execution.
+States (Very Important for Exam)
+State Type	Purpose
+Task	Calls Lambda / AWS services
+Choice	If-else logic
+Pass	Pass input to output, inject static data
+Wait	Delay for seconds / until timestamp
+Succeed	End workflow successfully
+Fail	End workflow with failure
+Parallel	Run states in parallel
+Map	Run the same step for items dynamically (dynamic parallelism)
+Transitions
+
+Use "Next" field → decide next state.
+Terminal states → "End": true, "Succeed", "Fail".
+
+🔥 3. Workflow Types
+A. Standard Workflows
+At-most once execution
+Can run up to 1 year
+Execution history visible
+Use case: long-running, auditable workflows
+
+Performance Limits
+Executions: 2,000/sec
+Transitions: 4,000/sec
+Pricing: per state transition
+
+B. Express Workflows
+At-least once execution
+Run up to 5 minutes
+Execution history → CloudWatch Logs
+Use case: high-volume, fast workflows
+(IoT, streaming, EMR job trigger, real-time event processing)
+
+Performance
+Executions: 100,000/sec
+Transitions: nearly unlimited
+Pricing: execution count + duration
+
+⚡ 4. Express Workflow Types
+Type	API Call	Behavior
+Synchronous	StartSyncExecution	Waits until workflow finishes and returns result
+Asynchronous	StartExecution	Returns immediately, you must poll for result
+
+Exam Tip:
+StartExecution → async
+StartSyncExecution → sync
+(Always appears in Pro-level exam)
+
+⭐ 5. Use Cases (High Probability Exam Questions)
+A. Function Orchestration
+
+Run multiple Lambda functions in order.
+Output of one → input of next.
+
+B. Branching (Choice State)
+
+E.g., Credit limit request → approve or reject → manager approval → next step.
+
+C. Human in the Loop
+
+Use Callback + Task Token.
+
+Example:
+Stock approval, KYC verification, money transfer approval.
+
+D. Parallel Processing
+
+E.g., Generate multiple video resolutions at same time.
+
+Uses Parallel state.
+
+E. Dynamic Parallelism
+
+Uses Map State
+Example:
+Processing multiple SQS messages or order items.
+
+🔗 6. Service Integrations (VERY IMPORTANT TABLE)
+
+Step Functions integrates with 200+ services, but exam focuses on patterns:
+
+Integration Patterns
+
+Request-Response
+
+Run Job (Synchronous)
+
+Wait for Callback Task Token
+
+Examples:
+
+Service	RR	Run Job	Callback
+Lambda	✔	❌	✔ (via callback)
+ECS	✔	✔	✔
+Batch	✔	✔	✔
+SNS	✔	❌	❌
+SQS	✔	❌	❌
+Glue	✔	✔	❌
+EMR	✔	✔	❌
+Step Functions (Nested)	✔	✔	✔
+
+Exam Trap:
+SNS + SQS → NO “Run Job”
+Glue → No callback
+Lambda → supports callback token
+
+Chapter 2: The Workers (States)
+
+The kingdom had different types of workers.
+
+⚒️ 1. Task Worker
+
+The main worker — does all the real work.
+
+Example:
+“Go call Lambda!”
+“Write to DynamoDB!”
+
+🤔 2. Choice Worker
+
+The wise decision-maker.
+
+Example:
+“Is credit score > 700? → Go to Approval Room.”
+“Else → Go to Rejection Room.”
+
+😴 3. Wait Worker
+
+The lazy one — sleeps for N seconds.
+
+🪞 4. Pass Worker
+
+Does nothing. Just passes data.
+
+(Think of a chaatwala passing plate to next person 😄)
+
+🎉 5. Succeed Worker
+
+Shouts: “Hurray! Workflow complete!”
+
+
+1. Step Functions is primarily used for:
+
+A. Monitoring EC2 instances
+B. Orchestrating serverless workflows
+C. Storing large datasets
+D. Deploying container applications
+
+Answer: B
+✔ Step Functions orchestrate Lambda + AWS services.
+
+2. Step Functions workflows are defined using:
+
+A. YAML
+B. CloudFormation JSON only
+C. Amazon States Language (ASL)
+D. CDK only
+
+Answer: C
+
+3. Each run of a state machine is called:
+
+A. Job
+B. Execution
+C. Task
+D. Trigger
+
+Answer: B
+
+4. A Task state is used to:
+
+A. Add delay
+B. Make decisions
+C. Perform work by calling AWS services
+D. End the workflow
+
+Answer: C
+
+5. Which state is used for branching logic?
+
+A. Wait
+B. Choice
+C. Pass
+D. Parallel
+
+Answer: B
+✔ Choice = if/else.
+
+6. Standard workflows have a maximum duration of:
+
+A. 5 minutes
+B. 1 hour
+C. 1 day
+D. 1 year
+
+Answer: D
+
+7. Express workflows have a maximum duration of:
+
+A. 30 minutes
+B. 1 hour
+C. 5 minutes
+D. 12 hours
+
+Answer: C
+
+8. Standard workflows execution guarantee:
+
+A. Exactly once
+B. At most once
+C. At least once
+D. Best effort
+
+Answer: B
+
+9. Express workflows execution guarantee:
+
+A. Exactly once
+B. Sometimes
+C. At least once
+D. Never guaranteed
+
+Answer: C
+
+10. Express workflow execution history is stored in:
+
+A. Step Functions console
+B. CloudTrail
+C. CloudWatch Logs
+D. DynamoDB
+
+Answer: C
+
+11. Which API call is used for synchronous express workflow?
+
+A. StartExecution
+B. StartWorkflow
+C. StartSyncExecution
+D. ExecuteNow
+
+Answer: C
+
+12. Which API call is asynchronous?
+
+A. StartSyncExecution
+B. RunJob
+C. StartExecution
+D. ExecuteAsync
+
+Answer: C
+
+13. Which state ends workflow successfully?
+
+A. Fail
+B. Choice
+C. Succeed
+D. Exit
+
+Answer: C
+
+14. Which state is used to wait for a fixed time?
+
+A. Pass
+B. Pause
+C. Wait
+D. Timer
+
+Answer: C
+
+15. Which state is used to process multiple items dynamically?
+
+A. Parallel
+B. Map
+C. Task
+D. Scatter
+
+Answer: B
+
+16. Parallel state:
+
+A. Runs steps sequentially
+B. Runs states in parallel
+C. Always fails
+D. Is same as Map state
+
+Answer: B
+
+17. Map state is mostly used for:
+
+A. Human approval
+B. Looping through arrays
+C. Error logging
+D. API gateway integration
+
+Answer: B
+
+18. Callback pattern uses:
+
+A. SNS token
+B. Task Token
+C. SQS receipt ID
+D. IAM PassRole
+
+Answer: B
+
+19. Which service supports "Wait for Callback"?
+
+A. SNS
+B. Lambda
+C. S3
+D. API Gateway
+
+Answer: B
+
+20. Standard workflow limits:
+
+Execution per second:
+A. 200
+B. 2,000
+C. 20,000
+D. 100,000
+
+Answer: B
+
+21. Express workflow max executions per second:
+
+A. 5,000
+B. 10,000
+C. 50,000
+D. 100,000
+
+Answer: D
+
+22. Step Functions pricing for Standard workflow is based on:
+
+A. Execution duration
+B. State transitions
+C. Data size
+D. CPU usage
+
+Answer: B
+
+23. You need to start EMR, run Glue jobs fast. Which workflow?
+
+A. Standard
+B. Express
+C. Long-running
+D. Manual process
+
+Answer: B
+
+24. You need a 6-month approval workflow. Choose:
+
+A. EC2 script
+B. Common Queue
+C. Standard Workflow
+D. Express Workflow
+
+Answer: C
+
+25. Which state injects static data?
+
+A. Task
+B. Pass
+C. Choice
+D. Fail
+
+Answer: B
+
+26. Human approval workflow uses:
+
+A. Map state
+B. SNS subscription
+C. Callback task token
+D. Parallel state
+
+Answer: C
+
+27. Failure is represented using:
+
+A. Error state
+B. Fail state
+C. Break state
+D. Exit state
+
+Answer: B
+
+28. Which integration pattern waits until job completes?
+
+A. Request-Response
+B. Run Job
+C. Callback
+D. Map
+
+Answer: B
+
+29. Which services do NOT support Run Job?
+
+A. Glue
+B. EMR
+C. SNS
+D. Batch
+
+Answer: C
+
+30. API Gateway invokes a workflow and must get the final output. Which type of workflow?
+
+A. Standard
+B. Express – Synchronous
+C. Express – Asynchronous
+D. Manual
+
+Answer: B
+✔ API Gateway → synchronous only.
+
+
