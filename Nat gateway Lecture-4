@@ -273,3 +273,6 @@ Kyun C?
 - Centralized inspection ✅ (Security appliance)
 - Logging ✅ (Traffic mirroring)
 - Compliance ✅ (All requirements meet)
+
+Public Subnet → Internet Gateway → Public IP → Internet se baat
+Private Subnet → NAT Gateway → No Public IP → Safe & Secure
