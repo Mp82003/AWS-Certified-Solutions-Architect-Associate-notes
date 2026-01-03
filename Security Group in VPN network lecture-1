@@ -45,7 +45,10 @@ Important Features - Exam Ke Liye:
  Real-time changes!
 
 Security Groups vs Network ACLs (Exam Mein Zaroor Puchte Hain):
-FeatureSecurity GroupsNetwork ACLsKaha lagta haiInstance levelSubnet levelStateful/StatelessStateful ✅Stateless ❌RulesSirf AllowAllow + Deny donoRule ProcessingSab rules check hoteNumber order meinReturn TrafficAuto allowExplicitly allow karna padtaDefaultAll DENY inboundCustom NACL = DENY all
+Feature            Security Groups                                Network ACLs
+Kaha lagta hai      Instance level                           Subnet level
+Stateful/Stateless    Stateful ✅                         Stateless ❌RulesSirf
+Allow                  Allow + Deny donoRule ProcessingSab rules check hoteNumber order meinReturn TrafficAuto allowExplicitly allow karna padtaDefaultAll DENY inboundCustom NACL = DENY all
 Common Exam Scenarios:
 
 Scenario 1: Web Server Setup
